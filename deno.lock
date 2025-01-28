@@ -1,0 +1,16 @@
+{
+  "version": "4",
+  "specifiers": {
+    "npm:@sinclair/parsebox@~0.8.2": "0.8.2"
+  },
+  "npm": {
+    "@sinclair/parsebox@0.8.2": {
+      "integrity": "sha512-7OMIAWx4SPmB36JyR0LDGmd3dgEZmIaFwKKMXeS2mseVG6ADoVwmOqqpLj8phfNE0M9FeTU0x7H6eWCGIrdQBw=="
+    }
+  },
+  "workspace": {
+    "dependencies": [
+      "npm:@sinclair/parsebox@~0.8.2"
+    ]
+  }
+}
