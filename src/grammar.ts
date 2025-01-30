@@ -1,5 +1,6 @@
 import { assertEquals } from "jsr:@std/assert"
 import { Runtime } from 'jsr:@kawcco/parsebox'
+import { Binding, Expr, ExprType, Type, TypeType } from "./ast.ts";
 
 const { Const, Tuple, Union, Ident, Module, Ref, Array, Optional } = Runtime
 
@@ -135,83 +136,202 @@ const Int = Tuple(
         Digit,
         Array(Digit)
     ],
-    ([[minus], first_digit, digits]) => [parseInt((minus ?? "") + first_digit + digits.join(""))]
+    ([[minus], first_digit, digits]) => parseInt((minus ?? "") + first_digit + digits.join(""))
 )
 
+
 const Language = new Module({
-    Expr: Tuple([
-        Ref('ExprWithoutApplication'),
-        Array(Tuple([
+    Expr: Tuple(
+        [
+            Ref<Expr>('ExprWithoutApplication'),
+            Array(Tuple([
+                Tokens.LParen,
+                Ref<Expr>('Expr'),
+                Tokens.RParen,
+            ], ([, expr,]) => expr)),
+        ],
+        ([base, applicationArgs]) => {
+            let expr = base
+            for (const argument of applicationArgs) {
+                expr = { type: ExprType.Application, lambda: base, argument }
+            }
+            return expr
+        }
+    ),
+    ExprWithoutApplication: Union(
+        [
+            Ref<Expr>('Abstraction'),
+            Ref<Expr>('Let'),
+            Ref<Expr>('Ternary'),
+            Ref<Expr>('Int'),
+            Ref<Expr>('Bool'),
+            Ref<Expr>('Var'),
+            Ref<Expr>('ExprParen'),
+        ]
+    ),
+    ExprParen: Tuple(
+        [
             Tokens.LParen,
-            Ref('Expr'),
+            Ref<Expr>('Expr'),
             Tokens.RParen,
-        ])),
-    ]),
-    ExprWithoutApplication: Union([
-        Tuple([
-            Tokens.LParen,
-            Ref('Expr'),
-            Tokens.RParen,
-        ]),
-        Ref('Abstraction'),
-        Ref('Let'),
-        Ref('Ternary'),
-        Ref('Int'),
-        Ref('Bool'),
-        Ref('Var'),
-    ]),
-    Ty: Union([
-        Tokens.Int,
-        Tokens.Bool,
-        Ref('TyFn'),
-    ]),
-    TyFn: Tuple([
-        Tokens.Fn,
-        Tokens.LBracket,
-        Ref('Ty'),
-        Tokens.Comma,
-        Ref('Ty'),
-        Tokens.RBracket,
-    ]),
-    Binding: Tuple([
-        Ident(),
-        Tokens.Colon,
-        Ref('Ty'),
-    ]),
-    Abstraction: Tuple([
-        Ref('Binding'),
-        Tokens.Arrow,
-        Ref('Expr')
-    ]),
-    Let: Tuple([
-        Tokens.Let,
-        Ref('Binding'),
-        Tokens.Equals,
-        Ref('Expr'),
-        Tokens.In,
-        Ref('Expr'),
-    ]),
-    Ternary: Tuple([
-        Tokens.If,
-        Ref('Expr'),
-        Tokens.Then,
-        Ref('Expr'),
-        Tokens.Else,
-        Ref('Expr'),
-    ]),
-    Var: Tuple([Ident()]),
-    Int: Tuple([Int]),
-    Bool: Union([
-        Tokens.True,
-        Tokens.False,
-    ]),
+        ],
+        ([, expr,]) => expr
+    ),
+    Ty: Union(
+        [
+            Tokens.Int,
+            Tokens.Bool,
+            Ref<Type>('TyFn'),
+        ],
+        raw => (
+            raw == "int"
+                ? { type: TypeType.Int }
+                : raw == "bool"
+                    ? { type: TypeType.Bool }
+                    : raw
+        ) satisfies Type,
+    ),
+    TyFn: Tuple(
+        [
+            Tokens.Fn,
+            Tokens.LBracket,
+            Ref<Type>('Ty'),
+            Tokens.Comma,
+            Ref<Type>('Ty'),
+            Tokens.RBracket,
+        ],
+        ([, , argumentType, , returnType]) =>
+            ({ type: TypeType.Function, argumentType, returnType } satisfies Type),
+    ),
+    Binding: Tuple(
+        [
+            Ident(),
+            Tokens.Colon,
+            Ref<Type>('Ty'),
+        ],
+        ([name, , type]) => ({ name, type } as Binding),
+    ),
+    Abstraction: Tuple(
+        [
+            Ref<Binding>('Binding'),
+            Tokens.Arrow,
+            Ref<Expr>('Expr')
+        ],
+        ([binding, , body]) => ({ type: ExprType.Abstraction, binding, body } satisfies Expr),
+    ),
+    Let: Tuple(
+        [
+            Tokens.Let,
+            Ref<Binding>('Binding'),
+            Tokens.Equals,
+            Ref<Expr>('Expr'),
+            Tokens.In,
+            Ref<Expr>('Expr'),
+        ],
+        ([, binding, , boundTo, , boundIn]) =>
+            ({ type: ExprType.Let, binding, boundIn, boundTo } satisfies Expr),
+    ),
+    Ternary: Tuple(
+        [
+            Tokens.If,
+            Ref<Expr>('Expr'),
+            Tokens.Then,
+            Ref<Expr>('Expr'),
+            Tokens.Else,
+            Ref<Expr>('Expr'),
+        ],
+        ([, condition, , positive, , negative]) =>
+            ({ type: ExprType.Ternary, condition, positive, negative } satisfies Expr),
+    ),
+    Var: Tuple(
+        [
+            Ident(),
+        ],
+        ([name]) => ({ type: ExprType.Var, name } satisfies Expr),
+    ),
+    Int: Tuple(
+        [
+            Int,
+        ],
+        ([value]) => ({ type: ExprType.LiteralInt, value } satisfies Expr),
+    ),
+    Bool: Union(
+        [
+            Tokens.True,
+            Tokens.False,
+        ],
+        raw => ({ type: ExprType.LiteralBool, value: raw == "true" } satisfies Expr),
+    ),
 })
 
-const test = `let id = x: int -> x in
-let g = x: fn[int, int] -> x(x) in
-g(id)(5)`
-
-const res = Language.Parse('Expr', 'let x: int = y in x(2)'.replace(/\s+/g, " "))
-console.dir(res, { depth: 999 })
-
-
+Deno.test({
+    name: "Language.Parse: parsing one of each type of Expr and Type",
+    fn() {
+        assertEquals(
+            Language.Parse('Expr', `
+                let x: fn[int, bool] =
+                    y: int -> odd(y)
+                in if x(2)
+                    then false
+                    else true
+                `.trim()),
+            [{
+                type: ExprType.Let,
+                binding: {
+                    name: "x",
+                    type: {
+                        type: TypeType.Function,
+                        argumentType: {
+                            type: TypeType.Int,
+                        },
+                        returnType: {
+                            type: TypeType.Bool,
+                        },
+                    },
+                },
+                boundIn: {
+                    type: ExprType.Ternary,
+                    condition: {
+                        type: ExprType.Application,
+                        lambda: {
+                            type: ExprType.Var,
+                            name: "x",
+                        },
+                        argument: {
+                            type: ExprType.LiteralInt,
+                            value: 2,
+                        },
+                    },
+                    positive: {
+                        type: ExprType.LiteralBool,
+                        value: false,
+                    },
+                    negative: {
+                        type: ExprType.LiteralBool,
+                        value: true,
+                    },
+                },
+                boundTo: {
+                    type: ExprType.Abstraction,
+                    binding: {
+                        name: "y",
+                        type: {
+                            type: TypeType.Int,
+                        },
+                    },
+                    body: {
+                        type: ExprType.Application,
+                        lambda: {
+                            type: ExprType.Var,
+                            name: "odd",
+                        },
+                        argument: {
+                            type: ExprType.Var,
+                            name: "y",
+                        },
+                    },
+                },
+            }, ""],
+        )
+    }
+})
