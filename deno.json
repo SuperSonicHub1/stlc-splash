@@ -1,5 +1,5 @@
 {
   "imports": {
-    "@sinclair/parsebox": "npm:@sinclair/parsebox@^0.8.2"
+    "@kawcco/parsebox": "jsr:@kawcco/parsebox@^0.1.0"
   }
 }
