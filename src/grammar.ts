@@ -1,7 +1,7 @@
 import { assertEquals } from "jsr:@std/assert"
 import { Runtime } from 'jsr:@kawcco/parsebox'
 
-const { Const, Tuple, Union, Number, Ident, Module, Ref } = Runtime
+const { Const, Tuple, Union, Ident, Module, Ref, Array, Optional } = Runtime
 
 /**
  * Pre-processing step for parsing that removes C-style single— and
@@ -117,16 +117,48 @@ const Tokens = {
     True: Const('true'),
     False: Const('false'),
 }
+const Digit = Union([
+    Const("0"),
+    Const("1"),
+    Const("2"),
+    Const("3"),
+    Const("4"),
+    Const("5"),
+    Const("6"),
+    Const("7"),
+    Const("8"),
+    Const("9"),
+])
+const Int = Tuple(
+    [
+        Optional(Const("-")),
+        Digit,
+        Array(Digit)
+    ],
+    ([[minus], first_digit, digits]) => [parseInt((minus ?? "") + first_digit + digits.join(""))]
+)
 
 const Language = new Module({
-    Expr: Union([
+    Expr: Tuple([
+        Ref('ExprWithoutApplication'),
+        Array(Tuple([
+            Tokens.LParen,
+            Ref('Expr'),
+            Tokens.RParen,
+        ])),
+    ]),
+    ExprWithoutApplication: Union([
+        Tuple([
+            Tokens.LParen,
+            Ref('Expr'),
+            Tokens.RParen,
+        ]),
         Ref('Abstraction'),
-        Ref('Application'),
         Ref('Let'),
         Ref('Ternary'),
-        Ref('Var'),
         Ref('Int'),
         Ref('Bool'),
+        Ref('Var'),
     ]),
     Ty: Union([
         Tokens.Int,
@@ -140,7 +172,7 @@ const Language = new Module({
         Tokens.Comma,
         Ref('Ty'),
         Tokens.RBracket,
-    ]),    
+    ]),
     Binding: Tuple([
         Ident(),
         Tokens.Colon,
@@ -151,13 +183,7 @@ const Language = new Module({
         Tokens.Arrow,
         Ref('Expr')
     ]),
-    Application: Tuple([
-        Ref('Expr'),
-        Tokens.LParen,
-        Ref('Expr'),
-        Tokens.RParen,
-    ]),
-    Let: Union([
+    Let: Tuple([
         Tokens.Let,
         Ref('Binding'),
         Tokens.Equals,
@@ -174,8 +200,7 @@ const Language = new Module({
         Ref('Expr'),
     ]),
     Var: Tuple([Ident()]),
-    // TODO(supersonichub1): Also parses floats; change to be more strict.
-    Int: Tuple([Number()]),
+    Int: Tuple([Int]),
     Bool: Union([
         Tokens.True,
         Tokens.False,
@@ -186,6 +211,7 @@ const test = `let id = x: int -> x in
 let g = x: fn[int, int] -> x(x) in
 g(id)(5)`
 
-// const res = Language.Parse('Bool', 'true')
-// console.log(res)
+const res = Language.Parse('Expr', 'let x: int = y in x(2)'.replace(/\s+/g, " "))
+console.dir(res, { depth: 999 })
+
 
