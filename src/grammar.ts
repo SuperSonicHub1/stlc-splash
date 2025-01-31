@@ -153,7 +153,7 @@ export const Language = new Module({
         ([base, applicationArgs]) => {
             let expr = base
             for (const argument of applicationArgs) {
-                expr = { type: ExprType.Application, lambda: base, argument }
+                expr = { type: ExprType.Application, lambda: expr, argument }
             }
             return expr
         }
