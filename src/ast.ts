@@ -10,7 +10,7 @@ export enum ExprType {
 export type Expr =
     | { type: ExprType.Application, lambda: Expr, argument: Expr }
     | { type: ExprType.Abstraction, binding: Binding, body: Expr }
-    | { type: ExprType.Let, binding: Binding, boundTo: Expr, boundIn: Expr }
+    | { type: ExprType.Let, binding: BindingUntyped, boundTo: Expr, boundIn: Expr }
     | { type: ExprType.Var, name: string }
     | { type: ExprType.Ternary, condition: Expr, positive: Expr, negative: Expr }
     | { type: ExprType.LiteralInt, value: number }
@@ -29,4 +29,5 @@ export type Type =
 
 
 export type Binding = { name: string, type: Type }
+export type BindingUntyped = { name: string, type: Type | null }
 

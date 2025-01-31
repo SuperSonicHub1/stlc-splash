@@ -1,6 +1,6 @@
 import { assertEquals } from "jsr:@std/assert"
 import { Runtime } from 'jsr:@kawcco/parsebox'
-import { Binding, Expr, ExprType, Type, TypeType } from "./ast.ts";
+import { Binding, BindingUntyped, Expr, ExprType, Type, TypeType } from "./ast.ts";
 
 const { Const, Tuple, Union, Ident, Module, Ref, Array, Optional } = Runtime
 
@@ -140,7 +140,7 @@ const Int = Tuple(
 )
 
 
-const Language = new Module({
+export const Language = new Module({
     Expr: Tuple(
         [
             Ref<Expr>('ExprWithoutApplication'),
@@ -211,6 +211,16 @@ const Language = new Module({
         ],
         ([name, , type]) => ({ name, type } as Binding),
     ),
+    BindingUntyped: Tuple(
+        [
+            Ident(),
+            Optional(Tuple([
+                Tokens.Colon,
+                Ref<Type>('Ty'),
+            ], ([, type]) => type))
+        ],
+        ([name, [type]]) => ({ name, type: type ?? null } as BindingUntyped),
+    ),
     Abstraction: Tuple(
         [
             Ref<Binding>('Binding'),
@@ -222,7 +232,7 @@ const Language = new Module({
     Let: Tuple(
         [
             Tokens.Let,
-            Ref<Binding>('Binding'),
+            Ref<BindingUntyped>('BindingUntyped'),
             Tokens.Equals,
             Ref<Expr>('Expr'),
             Tokens.In,
