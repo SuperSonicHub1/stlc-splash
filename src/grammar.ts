@@ -27,14 +27,14 @@ function processComments(input: string): string {
                     // Single line comment
                     if (input[i] == '/' && input[i + 1] == '/') {
                         state = CommentState.Single
-                        // Skip one char
+                        // Skip one char extra
                         i++
                         continue
                     }
                     // Multi-line comment
                     if (input[i] == '/' && input[i + 1] == '*') {
                         state = CommentState.Multiple
-                        // Skip one char
+                        // Skip one char extra
                         i++
                         continue
                     }
@@ -51,7 +51,7 @@ function processComments(input: string): string {
             case CommentState.Multiple:
                 if (input.length - i >= 2 && input[i] == '*' && input[i + 1] == '/') {
                     state = CommentState.None
-                    // Skip one char
+                    // Skip one char extra
                     i++
                 }
                 break
