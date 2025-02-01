@@ -118,27 +118,6 @@ const Tokens = {
     True: Const('true'),
     False: Const('false'),
 }
-const Digit = Union([
-    Const("0"),
-    Const("1"),
-    Const("2"),
-    Const("3"),
-    Const("4"),
-    Const("5"),
-    Const("6"),
-    Const("7"),
-    Const("8"),
-    Const("9"),
-])
-const Int = Tuple(
-    [
-        Optional(Const("-")),
-        Digit,
-        Array(Digit)
-    ],
-    ([[minus], first_digit, digits]) => parseInt((minus ?? "") + first_digit + digits.join(""))
-)
-
 
 export const Language = new Module({
     Expr: Tuple(
@@ -259,11 +238,30 @@ export const Language = new Module({
         ],
         ([name]) => ({ type: ExprType.Var, name } satisfies Expr),
     ),
+    Digit: Union([
+        Const("0"),
+        Const("1"),
+        Const("2"),
+        Const("3"),
+        Const("4"),
+        Const("5"),
+        Const("6"),
+        Const("7"),
+        Const("8"),
+        Const("9"),
+    ]),
     Int: Tuple(
         [
-            Int,
+            Optional(Const("-")),
+            Ref("Digit"),
+            Array(Ref("Digit"))
         ],
-        ([value]) => ({ type: ExprType.LiteralInt, value } satisfies Expr),
+        ([[minus], first_digit, digits]) => (
+            {
+                type: ExprType.LiteralInt,
+                value: parseInt((minus ?? "") + first_digit + digits.join(""))
+            } satisfies Expr
+        ),
     ),
     Bool: Union(
         [
