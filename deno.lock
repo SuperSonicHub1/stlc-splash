@@ -1,9 +1,12 @@
 {
   "version": "4",
   "specifiers": {
+    "jsr:@kawcco/parsebox@*": "0.2.0",
     "jsr:@kawcco/parsebox@0.2.0": "0.2.0",
     "jsr:@std/assert@*": "1.0.11",
-    "jsr:@std/internal@^1.0.5": "1.0.5"
+    "jsr:@std/internal@^1.0.5": "1.0.5",
+    "npm:katex@*": "0.16.21",
+    "npm:katex@~0.16.21": "0.16.21"
   },
   "jsr": {
     "@kawcco/parsebox@0.2.0": {
@@ -19,9 +22,21 @@
       "integrity": "54a546004f769c1ac9e025abd15a76b6671ddc9687e2313b67376125650dc7ba"
     }
   },
+  "npm": {
+    "commander@8.3.0": {
+      "integrity": "sha512-OkTL9umf+He2DZkUq8f8J9of7yL6RJKI24dVITBmNfZBmri9zYZQrKkuXiKhyfPSu8tUhnVBB1iKXevvnlR4Ww=="
+    },
+    "katex@0.16.21": {
+      "integrity": "sha512-XvqR7FgOHtWupfMiigNzmh+MgUVmDGU2kXZm899ZkPfcuoPuFxyHmXsgATDpFZDAXCI8tvinaVcDo8PIIJSo4A==",
+      "dependencies": [
+        "commander"
+      ]
+    }
+  },
   "workspace": {
     "dependencies": [
-      "jsr:@kawcco/parsebox@0.2.0"
+      "jsr:@kawcco/parsebox@0.2.0",
+      "npm:katex@~0.16.21"
     ]
   }
 }

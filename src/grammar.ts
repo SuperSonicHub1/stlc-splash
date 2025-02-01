@@ -1,6 +1,7 @@
 import { assertEquals } from "jsr:@std/assert"
 import { Runtime } from 'jsr:@kawcco/parsebox'
 import { Binding, BindingUntyped, Expr, ExprType, Type, TypeType } from "./ast.ts";
+import { inspectGrammarJupyter } from "./inspect.ts";
 
 const { Const, Tuple, Union, Ident, Module, Ref, Array, Optional } = Runtime
 
@@ -119,7 +120,16 @@ const Tokens = {
     False: Const('false'),
 }
 
-export const Language = new Module({
+/**
+ * Extension of {@link Module} for the lecture.
+ */
+class OurModule extends Module {
+    [Deno.jupyter.$display]() {
+        return inspectGrammarJupyter(this)
+    }
+}
+
+export const Language = new OurModule({
     Expr: Tuple(
         [
             Ref<Expr>('ExprWithoutApplication'),

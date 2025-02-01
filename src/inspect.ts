@@ -1,48 +1,83 @@
 import { Runtime } from "@kawcco/parsebox";
 import type { Module, IParser } from "@kawcco/parsebox";
 import { assertEquals } from "jsr:@std/assert";
+import { richLatexGen } from "./notebook.ts";
 
-export function inspectGrammar(module: Module): string {
+enum GrammarOutput {
+	Plain,
+	Latex,
+}
+export function inspectGrammar(module: Module, output: GrammarOutput = GrammarOutput.Plain): string {
 	// @ts-ignore Deno is being annoying.
 	const properties = module['properties']
-	return Object.entries(properties)
-		.map(([name, parser]) => `${name} ::= ${inspectParser(parser)}`)
-		.join('\n\n')
+	const equals = (output == GrammarOutput.Latex ? '&' : '') + "::="
+	const base = Object.entries(properties)
+		.map(([name, parser]) => {
+			const pname = output == GrammarOutput.Latex
+				? String.raw`\mathsf{${name}}`
+				: name
+			return `${pname} ${equals} ${inspectParser(parser, output)}`
+		})
+		.join(output == GrammarOutput.Latex ? String.raw`\\` : '\n\n')
+	const final = output == GrammarOutput.Latex
+		? String.raw`\begin{align*}
+${base}
+\end{align*}`
+		: base
+	return final
 }
 
-export function inspectParser(x: IParser): string {
+export function inspectGrammarJupyter(module: Module): Record<string, string> {
+	const plain = inspectGrammar(module, GrammarOutput.Plain)
+	const latex = inspectGrammar(module, GrammarOutput.Latex)
+	return { ...richLatexGen(latex, true), 'text/plain': plain }
+}
+
+export function inspectParser(x: IParser, output: GrammarOutput = GrammarOutput.Plain): string {
 	if (Runtime.Guard.IsConst(x)) {
-		return Deno.inspect(x.value)
+		return output == GrammarOutput.Latex
+			? String.raw`\texttt{${Deno.inspect(x.value)}}`
+			: Deno.inspect(x.value)
 	}
 	else if (Runtime.Guard.IsTuple(x)) {
-		return x.parsers.map(inspectParser).join(" ")
+		return x.parsers.map(x => inspectParser(x, output)).join(
+			output == GrammarOutput.Latex ? String.raw` \: ` : " "
+		)
 	}
 	else if (Runtime.Guard.IsUnion(x)) {
-		return x.parsers.map(inspectParser).join(" | ")
+		return x.parsers.map(x => inspectParser(x, output)).join(
+			output == GrammarOutput.Latex ? String.raw` \mid ` : " | "
+		)
 	}
 	else if (Runtime.Guard.IsArray(x)) {
-		return `(${inspectParser(x.parser)})*`
+		return `(${inspectParser(x.parser, output)})*`
 	}
 	else if (Runtime.Guard.IsOptional(x)) {
-		return `(${inspectParser(x.parser)})?`
+		return `(${inspectParser(x.parser, output)})?`
 	}
 	else if (Runtime.Guard.IsIdent(x) || Runtime.Guard.IsNumber(x)) {
-		return `<${x.type}>`
+		return output == GrammarOutput.Latex
+			? String.raw`\mathsf{${x.type}}`
+			: `<${x.type}>`
 	}
 	else if (Runtime.Guard.IsString(x)) {
-		return `<${x.type}<${Deno.inspect(x.options)}>>`
+		return output == GrammarOutput.Latex
+			? String.raw`\mathsf{${x.type}}[${x.options.map(x => String.raw`\texttt{${Deno.inspect(x)}}`).join(', ')}]`
+			: `<${x.type}<${Deno.inspect(x.options)}>>`
 	}
 	else if (Runtime.Guard.IsRef(x)) {
-		return `<${x.ref}>`
+		return output == GrammarOutput.Latex
+			? String.raw`\mathsf{${x.ref}}`
+			: `<${x.ref}>`
 	}
 	else {
-		// @ts-ignore Deno is being annoying
 		throw new Error(`Unexpected parser type: ${x.type}`);	
 	}
 }
 
+// TODO(supersonichub1): Test LaTeX output
 Deno.test({
-	name: "inspectParser: general exercise",
+	name: "inspectParser: general exercise for Plain",
 	fn() {
 		assertEquals(inspectParser(Runtime.Const('a')), '"a"')
 		assertEquals(
