@@ -1,5 +1,5 @@
 {
   "imports": {
-    "@kawcco/parsebox": "jsr:@kawcco/parsebox@^0.1.0"
+    "@kawcco/parsebox": "jsr:@kawcco/parsebox@0.2.0"
   }
 }
