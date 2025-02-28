@@ -3,6 +3,7 @@ import type { Module, IParser } from "@kawcco/parsebox";
 import { assertEquals } from "jsr:@std/assert";
 import { InspectOutput } from "./notebook.ts";
 import { Binding, BindingUntyped, Expr, ExprType, Type, TypeType } from "./ast.ts";
+import { Value, ValueType } from "./eval.ts";
 
 export function inspectGrammar(module: Module, output: InspectOutput = InspectOutput.Plain): string {
 	// @ts-ignore Deno is being annoying.
@@ -125,13 +126,25 @@ export function inspectBinding(binding: Binding | BindingUntyped, output: Inspec
 }
 export function inspectType(type: Type, output: InspectOutput = InspectOutput.Plain, mayNeedParen = false): string {
 	switch (type.type) {
-		case TypeType.Int: return output === InspectOutput.Latex ? "\\text{Int}" : "int"
-		case TypeType.Bool: return output === InspectOutput.Latex ? "\\text{Bool}" : "bool"
+		case TypeType.Int: return output === InspectOutput.Latex ? "\\mathsf{Int}" : "int"
+		case TypeType.Bool: return output === InspectOutput.Latex ? "\\mathsf{Bool}" : "bool"
 		case TypeType.Function: {
 			const base = output === InspectOutput.Latex
 				? `${inspectType(type.argumentType, output, true)} \\to ${inspectType(type.returnType, output)}`
 				: `${inspectType(type.argumentType, output, true)} -> ${inspectType(type.returnType, output)}`
 			return mayNeedParen ? `(${base})` : base
 		}
+	}
+}
+
+export function inspectValue(value: Value, output: InspectOutput = InspectOutput.Plain): string {
+	switch (value.type) {
+		case ValueType.Int:
+		case ValueType.Bool:
+			return `${value.value}`
+		case ValueType.Function:
+			return `${value.binding} ${output === InspectOutput.Plain ? '->' : '\\to'} ${inspectExpr(value.body, output)}`
+		case ValueType.FunctionNative:
+			return output === InspectOutput.Plain ? value.name : `\\operatorname{${value.name}}`
 	}
 }

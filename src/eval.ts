@@ -1,26 +1,44 @@
-import { Expr, ExprType } from "./ast.ts";
+import { Expr, ExprType, Ident } from "./ast.ts";
 import { CORE_VALUES } from "./core.ts";
-import { inspectExpr } from "./inspect.ts";
-import { InspectOutput } from "./notebook.ts";
 
-export type Value = number | boolean | ((v: Value) => Value)
 
-export function evaluate(expr: Expr, context: Record<string, Value> = CORE_VALUES): Value {
+export enum ValueType {
+    Int,
+    Bool,
+    Function,
+    FunctionNative,
+}
+export type Value =
+    | { type: ValueType.Int, value: number }
+    | { type: ValueType.Bool, value: boolean }
+    | { type: ValueType.Function, body: Expr, binding: Ident, context: Context }
+    | { type: ValueType.FunctionNative, eval: (v: Value) => Value, name: string }
+
+export type Context = Record<Ident, Value>
+
+
+export function evaluate(expr: Expr, context: Context = CORE_VALUES): Value {
     switch (expr.type) {
         case ExprType.Application: {
             const lambda = evaluate(expr.lambda, context)
             const argument = evaluate(expr.argument, context)
-            if (!(lambda instanceof Function)) {
-                throw new Error("Runtime eval error: cannot call type " + typeof lambda)
+            if (lambda.type === ValueType.Function) {
+                return evaluate(lambda.body, { ...lambda.context, [lambda.binding]: argument })
             }
-            return lambda(argument)
+            if (lambda.type === ValueType.FunctionNative) {
+                return lambda.eval(argument)
+            }
+            throw new Error("Runtime eval error: cannot call type " + ValueType[lambda.type])
         }
         case ExprType.Abstraction: {
-            const binding = expr.binding
+            const binding = expr.binding.name
             const body = expr.body
-            const result = (arg: Value) => evaluate(body, { ...context, [binding.name]: arg })
-            result.toString = () => `(${binding.name} -> ${inspectExpr(body, InspectOutput.Plain)})`
-            return result
+            return {
+                type: ValueType.Function,
+                binding,
+                body,
+                context,
+            }
         }
         case ExprType.Let: {
             const boundValue = evaluate(expr.boundTo, context)
@@ -41,10 +59,10 @@ export function evaluate(expr: Expr, context: Record<string, Value> = CORE_VALUE
             return evaluate(condition ? expr.positive : expr.negative, context)
         }
         case ExprType.LiteralInt: {
-            return expr.value
+            return { type: ValueType.Int, value: expr.value }
         }
         case ExprType.LiteralBool: {
-            return expr.value
+            return { type: ValueType.Bool, value: expr.value }
         }
     }
 }

@@ -1,11 +1,10 @@
 import { Expr, Type } from "./ast.ts";
 import { evaluate } from "./eval.ts";
 import { Language } from "./grammar.ts";
-import { solveTypes, typeName } from "./type.ts";
+import { solveTypes } from "./type.ts";
+import { inspectValue, inspectType } from "./inspect.ts";
 
 function replIteration(code: string): string {
-
-
     const parseResult = Language.Parse("Expr", code) as [Expr, string] | []
     if (parseResult.length === 0 || parseResult[1].trim().length > 0) {
         return "Syntax error" + (parseResult[1]?.length ?? 0 > 0 ? `: cannot match '...${parseResult[1]}'` : "")
@@ -19,7 +18,7 @@ function replIteration(code: string): string {
     }
     const value = evaluate(ast)
 
-    return `${value} : ${typeName(type)}`
+    return `${inspectValue(value)} : ${inspectType(type)}`
 }
 
 export async function repl() {
