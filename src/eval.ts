@@ -1,5 +1,7 @@
 import { Expr, ExprType } from "./ast.ts";
 import { CORE_VALUES } from "./core.ts";
+import { inspectExpr } from "./inspect.ts";
+import { InspectOutput } from "./notebook.ts";
 
 export type Value = number | boolean | ((v: Value) => Value)
 
@@ -16,7 +18,9 @@ export function evaluate(expr: Expr, context: Record<string, Value> = CORE_VALUE
         case ExprType.Abstraction: {
             const binding = expr.binding
             const body = expr.body
-            return arg => evaluate(body, { ...context, [binding.name]: arg })
+            const result = (arg: Value) => evaluate(body, { ...context, [binding.name]: arg })
+            result.toString = () => `(${binding.name} -> ${inspectExpr(body, InspectOutput.Plain)})`
+            return result
         }
         case ExprType.Let: {
             const boundValue = evaluate(expr.boundTo, context)
