@@ -124,7 +124,7 @@ const Tokens = {
 /**
  * Extension of {@link Module} for the lecture.
  */
-class OurModule extends Module {
+export class OurModule extends Module {
     [Deno.jupyter.$display]() {
         return displayJupyterInspector(inspectGrammar, this)
     }
