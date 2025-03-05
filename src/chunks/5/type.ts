@@ -25,6 +25,7 @@ export function solveTypes(expr: Expr, context: Record<string, Type> = CORE_TYPE
                 })
             }
         }
+        // @impl
         case ExprType.Let: {
             const boundToType = solveTypes(expr.boundTo, context)
             if (expr.binding.type !== null && !typesMatch(boundToType, expr.binding.type)) {
@@ -42,6 +43,7 @@ export function solveTypes(expr: Expr, context: Record<string, Type> = CORE_TYPE
                 throw new Error(`solveTypes: variable '${expr.name}' not found`)
             }
         }
+        // @impl
         case ExprType.Ternary: {
             const conditionType = solveTypes(expr.condition, context)
             const positiveType = solveTypes(expr.positive, context)

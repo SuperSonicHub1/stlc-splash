@@ -1,28 +1,85 @@
 import { Runtime } from 'jsr:@kawcco/parsebox'
+import { Binding, Expr, ExprType } from "./ast.ts";
 import { OurModule } from "../../grammar.ts";
-import { Expr, ExprType } from "./ast.ts";
 
-const { Const, Tuple, Union, Ref, Array, Optional } = Runtime
+const { Const, Tuple, Union, Ident, Ref, Array, Optional } = Runtime
 
 const Tokens = {
+    Arrow: Const('->'),
+    LParen: Const('('),
+    RParen: Const(')'),
+    LBracket: Const('['),
+    RBracket: Const(']'),
+    Int: Const('int'),
+    Bool: Const('bool'),
+    Fn: Const('fn'),
+    Comma: Const(','),
+    Colon: Const(':'),
+    Let: Const('let'),
+    In: Const('in'),
+    Equals: Const('='),
+    If: Const('if'),
+    Then: Const('then'),
+    Else: Const('else'),
     True: Const('true'),
     False: Const('false'),
 }
 
 export const Language = new OurModule({
-    Expr: Union(
+    Expr: Tuple(
         [
-            Ref('Int'),
-            Ref('Bool'),
+            Ref<Expr>('ExprWithoutApplication'),
+            Array(Tuple([
+                Tokens.LParen,
+                Ref<Expr>('Expr'),
+                Tokens.RParen,
+            ], ([, expr,]) => expr)),
+        ],
+        ([base, applicationArgs]) => {
+            let expr = base
+            for (const argument of applicationArgs) {
+                expr = { type: ExprType.Application, lambda: expr, argument }
+            }
+            return expr
+        }
+    ),
+    ExprWithoutApplication: Union(
+        [
+            Ref<Expr>('Abstraction'),
+            Ref<Expr>('Int'),
+            Ref<Expr>('Bool'),
+            Ref<Expr>('Var'),
+            Ref<Expr>('ExprParen'),
         ]
     ),
-    /// @impl
-    Bool: Union(
+    ExprParen: Tuple(
         [
-            Tokens.True,
-            Tokens.False,
+            Tokens.LParen,
+            Ref<Expr>('Expr'),
+            Tokens.RParen,
         ],
-        raw => ({ type: ExprType.LiteralBool, value: raw == "true" } satisfies Expr),
+        ([, expr,]) => expr
+    ),
+    /// @impl
+    Binding: Tuple(
+        [
+            Ident(),
+        ],
+        ([name,]) => ({ name } as Binding),
+    ),
+    Abstraction: Tuple(
+        [
+            Ref<Binding>('Binding'),
+            Tokens.Arrow,
+            Ref<Expr>('Expr')
+        ],
+        ([binding, , body]) => ({ type: ExprType.Abstraction, binding, body } satisfies Expr),
+    ),
+    Var: Tuple(
+        [
+            Ident(),
+        ],
+        ([name]) => ({ type: ExprType.Var, name } satisfies Expr),
     ),
     Digit: Union([
         Const("0"),
@@ -42,12 +99,18 @@ export const Language = new OurModule({
             Ref("Digit"),
             Array(Ref("Digit"))
         ],
-        /// @impl
         ([[minus], first_digit, digits]) => (
             {
                 type: ExprType.LiteralInt,
                 value: parseInt((minus ?? "") + first_digit + digits.join(""))
             } satisfies Expr
         ),
+    ),
+    Bool: Union(
+        [
+            Tokens.True,
+            Tokens.False,
+        ],
+        raw => ({ type: ExprType.LiteralBool, value: raw == "true" } satisfies Expr),
     ),
 })

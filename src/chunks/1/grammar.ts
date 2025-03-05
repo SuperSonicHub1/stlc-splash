@@ -13,8 +13,8 @@ const Tokens = {
 export const Language = new OurModule({
     Expr: Union(
         [
-            Ref('Int'),
-            Ref('Bool'),
+            Ref<Expr>('Int'),
+            Ref<Expr>('Bool'),
         ]
     ),
     /// @impl

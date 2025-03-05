@@ -40,6 +40,7 @@ export function evaluate(expr: Expr, context: Context = CORE_VALUES): Value {
                 context,
             }
         }
+        // @impl
         case ExprType.Let: {
             const boundValue = evaluate(expr.boundTo, context)
             return evaluate(expr.boundIn, { ...context, [expr.binding.name]: boundValue })
@@ -51,6 +52,7 @@ export function evaluate(expr: Expr, context: Context = CORE_VALUES): Value {
             }
             return value
         }
+        // @impl
         case ExprType.Ternary: {
             const condition = evaluate(expr.condition, context)
             if (typeof condition !== "boolean") {

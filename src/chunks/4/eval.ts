@@ -24,6 +24,7 @@ export function evaluate(expr: Expr, context: Context = {}): Value {
             if (lambda.type === ValueType.Function) {
                 return evaluate(lambda.body, { ...lambda.context, [lambda.binding]: argument })
             }
+            /// @impl
             if (lambda.type === ValueType.FunctionNative) {
                 return lambda.eval(argument)
             }

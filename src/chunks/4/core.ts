@@ -78,6 +78,7 @@ type CoreNames =
     | "nor"
     | "xor"
     | "xnor"
+/// @impl a few functions
 const CORE: { [k in CoreNames]: [Type, Value & { name: k }] } = {
     odd: [
         t_fn_int_bool,

@@ -1,10 +1,9 @@
 import { assertEquals } from "jsr:@std/assert"
 import { Runtime } from 'jsr:@kawcco/parsebox'
 import { Binding, BindingUntyped, Expr, ExprType, Type, TypeType } from "./ast.ts";
-import { inspectGrammar } from "./inspect.ts";
-import { displayJupyterInspector } from "./notebook.ts";
+import { OurModule } from "../../grammar.ts";
 
-const { Const, Tuple, Union, Ident, Module, Ref, Array, Optional } = Runtime
+const { Const, Tuple, Union, Ident, Ref, Array, Optional } = Runtime
 
 /**
  * Pre-processing step for parsing that removes C-style single— and
@@ -50,6 +49,7 @@ function processComments(input: string): string {
                     output += input[i]
                 }
                 break
+            /// @impl all logic for multi-line comments
             case CommentState.Multiple:
                 if (input.length - i >= 2 && input[i] == '*' && input[i + 1] == '/') {
                     state = CommentState.None
@@ -119,15 +119,6 @@ const Tokens = {
     Else: Const('else'),
     True: Const('true'),
     False: Const('false'),
-}
-
-/**
- * Extension of {@link Module} for the lecture.
- */
-export class OurModule extends Module {
-    [Deno.jupyter.$display]() {
-        return displayJupyterInspector(inspectGrammar, this)
-    }
 }
 
 export const Language = new OurModule({
@@ -219,6 +210,7 @@ export const Language = new OurModule({
         ],
         ([binding, , body]) => ({ type: ExprType.Abstraction, binding, body } satisfies Expr),
     ),
+    /// @impl
     Let: Tuple(
         [
             Tokens.Let,
@@ -231,6 +223,7 @@ export const Language = new OurModule({
         ([, binding, , boundTo, , boundIn]) =>
             ({ type: ExprType.Let, binding, boundIn, boundTo } satisfies Expr),
     ),
+    /// @impl
     Ternary: Tuple(
         [
             Tokens.If,

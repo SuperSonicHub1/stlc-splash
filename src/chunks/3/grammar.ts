@@ -1,104 +1,8 @@
-import { assertEquals } from "jsr:@std/assert"
 import { Runtime } from 'jsr:@kawcco/parsebox'
 import { Binding, Expr, ExprType, Type, TypeType } from "./ast.ts";
-import { displayJupyterInspector } from "../../notebook.ts";
-import { inspectGrammar } from "../../inspect.ts";
+import { OurModule } from "../../grammar.ts";
 
-const { Const, Tuple, Union, Ident, Module, Ref, Array, Optional } = Runtime
-
-/**
- * Pre-processing step for parsing that removes C-style single— and
- * multi-line comments from a string.
- * @param input String with comments
- * @returns String without comments.
- */
-function processComments(input: string): string {
-    enum CommentState {
-        None,
-        Single,
-        Multiple
-    }
-
-    let output = ''
-    let state = CommentState.None
-    for (let i = 0; i < input.length; i++) {
-        switch (state) {
-            case CommentState.None:
-                // Make sure there's enough characters
-                if (input.length - i >= 2) {
-                    // Single line comment
-                    if (input[i] == '/' && input[i + 1] == '/') {
-                        state = CommentState.Single
-                        // Skip one char extra
-                        i++
-                        continue
-                    }
-                    // Multi-line comment
-                    if (input[i] == '/' && input[i + 1] == '*') {
-                        state = CommentState.Multiple
-                        // Skip one char extra
-                        i++
-                        continue
-                    }
-                }
-                output += input[i]
-                break
-            case CommentState.Single:
-                if (input[i] == '\n') {
-                    state = CommentState.None
-                    // Include the newline
-                    output += input[i]
-                }
-                break
-            case CommentState.Multiple:
-                if (input.length - i >= 2 && input[i] == '*' && input[i + 1] == '/') {
-                    state = CommentState.None
-                    // Skip one char extra
-                    i++
-                }
-                break
-        }
-    }
-    return output
-}
-
-Deno.test({
-    name: "processComments: general exercise",
-    fn() {
-        const test = `a // hello
-b c d e
-f // g h i j k
-a /* aaaaaaaaa */ f
-a /* aaaaaa
-
-
-
-aaa */ f
-`
-        assertEquals(processComments(test), "a \nb c d e\nf \na  f\na  f\n")
-    },
-})
-
-Deno.test({
-    name: "processComments: empty string passthrough",
-    fn() {
-        assertEquals(processComments(''), '')
-    },
-})
-
-Deno.test({
-    name: "processComments: short string",
-    fn() {
-        assertEquals(processComments('a'), 'a')
-    },
-})
-
-Deno.test({
-    name: "processComments: slashes are still good",
-    fn() {
-        assertEquals(processComments('a / b'), 'a / b')
-    },
-})
+const { Const, Tuple, Union, Ident, Ref, Array, Optional } = Runtime
 
 const Tokens = {
     Arrow: Const('->'),
@@ -119,15 +23,6 @@ const Tokens = {
     Else: Const('else'),
     True: Const('true'),
     False: Const('false'),
-}
-
-/**
- * Extension of {@link Module} for the lecture.
- */
-export class OurModule extends Module {
-    [Deno.jupyter.$display]() {
-        return displayJupyterInspector(inspectGrammar, this)
-    }
 }
 
 export const Language = new OurModule({
