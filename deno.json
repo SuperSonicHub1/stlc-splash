@@ -1,6 +1,13 @@
 {
   "imports": {
     "@kawcco/parsebox": "jsr:@kawcco/parsebox@0.2.0",
+    "@std/expect": "jsr:@std/expect@^1.0.13",
+    "@std/testing": "jsr:@std/testing@^1.0.9",
     "katex": "npm:katex@^0.16.21"
+  },
+  "test": {
+    "include": [
+      "src/*.ts"
+    ]
   }
 }
