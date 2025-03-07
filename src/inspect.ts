@@ -7,7 +7,7 @@ import { Value, ValueType } from "./eval.ts";
 
 export function inspectGrammar(module: Module, output: InspectOutput = InspectOutput.Plain): string {
 	// @ts-ignore Deno is being annoying.
-	const properties = module['properties']
+	const properties = module['properties'] as Record<string, IParser>
 	const equals = (output == InspectOutput.Latex ? '&' : '') + "::="
 	const base = Object.entries(properties)
 		.map(([name, parser]) => {
