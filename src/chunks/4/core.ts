@@ -1,4 +1,4 @@
-import { Type, TypeType } from "./ast.ts";
+import { Ident, Type, TypeType } from "./ast.ts";
 import { Value, ValueType } from "./eval.ts";
 import { inspectValue } from "../../inspect.ts";
 
@@ -79,7 +79,7 @@ type CoreNames =
     | "xor"
     | "xnor"
 /// @impl a few functions
-const CORE: { [k in CoreNames]: [Type, Value & { name: k }] } = {
+const CORE: () => { [k in CoreNames]: [Type, Value & { name: k }] } = () => ({
     odd: [
         t_fn_int_bool,
         impl_native("odd", expectInt, v => v % 2 === 1)],
@@ -131,13 +131,13 @@ const CORE: { [k in CoreNames]: [Type, Value & { name: k }] } = {
     xnor: [
         t_fn_bool_bool_bool,
         impl_native_2("xnor", expectBool, expectBool, (a, b) => a === b)],
-} as const
+} as const)
 
-export const CORE_TYPES: Record<string, Type> =
-    Object.fromEntries(Object.entries(CORE)
+export const CORE_TYPES: () => Record<Ident, Type> =
+    () => Object.fromEntries(Object.entries(CORE)
         .map(([name, [type, _]]) => [name, type])
     )
-export const CORE_VALUES: Record<string, Value> =
-    Object.fromEntries(Object.entries(CORE)
+export const CORE_VALUES: () => Record<Ident, Value> =
+    () => Object.fromEntries(Object.entries(CORE)
         .map(([name, [_, value]]) => [name, value])
     )

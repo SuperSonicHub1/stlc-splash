@@ -17,7 +17,7 @@ export type Value =
 export type Context = Record<Ident, Value>
 
 
-export function evaluate(expr: Expr, context: Context = CORE_VALUES): Value {
+export function evaluate(expr: Expr, context: Context = CORE_VALUES()): Value {
     switch (expr.type) {
         case ExprType.Application: {
             const lambda = evaluate(expr.lambda, context)

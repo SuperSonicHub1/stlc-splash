@@ -2,7 +2,7 @@ import { Expr, ExprType, Type, TypeType } from "./ast.ts";
 import { CORE_TYPES } from "./core.ts";
 import { inspectType } from "../../inspect.ts";
 
-export function solveTypes(expr: Expr, context: Record<string, Type> = CORE_TYPES): Type {
+export function solveTypes(expr: Expr, context: Record<string, Type> = CORE_TYPES()): Type {
     switch (expr.type) {
         case ExprType.Application: {
             const argumentType = solveTypes(expr.argument, context)
