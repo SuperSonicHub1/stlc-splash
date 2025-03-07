@@ -1,3 +1,6 @@
+import { describe, it } from "jsr:@std/testing/bdd"
+import { expect } from "jsr:@std/expect"
+
 import { Type, TypeType } from "./ast.ts";
 import { Value, ValueType } from "./eval.ts";
 import { inspectValue } from "./inspect.ts";
@@ -15,10 +18,10 @@ const T = {
 
 const t_fn_int_bool = T.fn(T.int, T.bool)
 const t_fn_int_int = T.fn(T.int, T.int)
-const t_fn_bool_bool = T.fn(T.int, T.int)
+const t_fn_bool_bool = T.fn(T.bool, T.bool)
 const t_fn_int_int_int = T.fn(T.int, T.fn(T.int, T.int))
-const t_fn_int_int_bool = T.fn(T.int, T.fn(T.int, T.int))
-const t_fn_bool_bool_bool = T.fn(T.int, T.fn(T.int, T.int))
+const t_fn_int_int_bool = T.fn(T.int, T.fn(T.int, T.bool))
+const t_fn_bool_bool_bool = T.fn(T.bool, T.fn(T.bool, T.bool))
 
 type JSValue = number | boolean | Value
 
@@ -32,6 +35,27 @@ function toValue(x: number | boolean | Value): Value {
             return x
     }
 }
+
+describe("to_value", () => {
+    it("works on int", () => {
+        [1, 2, 408308, 5, -2].forEach(value => {
+            expect(toValue(value)).toStrictEqual({ type: ValueType.Int, value } satisfies Value)
+        })
+    })
+    it("works on bool", () => {
+        [false, true].forEach(value => {
+            expect(toValue(value)).toStrictEqual({ type: ValueType.Bool, value } satisfies Value)
+        })
+    })
+    it("works on Value", () => {
+        ([
+            { type: ValueType.FunctionNative, name: "id", eval: (x: Value) => x },
+            { type: ValueType.Int, value: 3 },
+        ] satisfies Value[]).forEach(value => {
+            expect(toValue(value)).toStrictEqual(value)
+        })
+    })
+})
 
 function impl_native<N extends string, T>(
     name: N,
@@ -60,6 +84,20 @@ function impl_native_2<N extends string, A, B>(
         name,
     }
 }
+
+describe("impl_native", () => {
+    it("generates odd", () => {
+        const odd = impl_native("odd", expectInt, v => v % 2 === 1)
+        expect(odd.name).toBe("odd")
+        expect(odd.type).toBe(ValueType.FunctionNative)
+        if (odd.type === ValueType.FunctionNative) {
+            expect(odd.eval(toValue(1))).toStrictEqual(toValue(true))
+            expect(odd.eval(toValue(3925))).toStrictEqual(toValue(true))
+            expect(odd.eval(toValue(4))).toStrictEqual(toValue(false))
+            expect(odd.eval(toValue(0))).toStrictEqual(toValue(false))
+        }
+    })
+})
 
 type CoreNames =
     | "odd"

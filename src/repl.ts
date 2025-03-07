@@ -1,7 +1,10 @@
+import { describe, it } from "@std/testing/bdd";
 import { Expr, Type } from "./ast.ts";
 import { Context, evaluate, Value } from "./eval.ts";
-import { OurModule } from "./grammar.ts";
+import { Language, OurModule } from "./grammar.ts";
 import { inspectValue, inspectType } from "./inspect.ts";
+import { expect } from "@std/expect/expect";
+import { solveTypes } from "./type.ts";
 
 type SolveTypes = (expr: Expr, context?: Record<string, Type>) => Type
 type Evaluate = (expr: Expr, context?: Context) => Value
@@ -38,3 +41,21 @@ export async function repl(solveTypes: SolveTypes, Language: OurModule, evaluate
     }
 
 }
+
+describe("repl test", () => {
+    const repl_iter = (s: string) => replIteration(s, solveTypes, Language, evaluate)
+    // @impl
+    it("evaluates expressions", () => {
+        expect(repl_iter("2")).toBe("2 : int")
+        expect(repl_iter("add(1)(2)")).toBe("3 : int")
+        expect(repl_iter("true")).toBe("true : bool")
+    })
+    it("rejects syntax errors", () => {
+        expect(repl_iter("a;a;a;a;")).toMatch(/^Syntax error/)
+        expect(repl_iter("#,.>/?23r98 u23r98*&#* )&20 1e1o i;1")).toMatch(/^Syntax error/)
+        expect(repl_iter("")).toMatch(/^Syntax error/)
+    })
+    it("rejects type errors", () => {
+        expect(repl_iter("(x: int -> x)(true)")).toMatch(/^Type error/)
+    })
+})
