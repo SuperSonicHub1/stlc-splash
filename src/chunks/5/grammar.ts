@@ -1,7 +1,6 @@
-import { assertEquals } from "jsr:@std/assert"
 import { Runtime } from 'jsr:@kawcco/parsebox'
-import { Binding, BindingUntyped, Expr, ExprType, Type, TypeType } from "./ast.ts";
-import { OurModule } from "../../grammar.ts";
+import { Binding, BindingUntyped, Expr, ExprType, Type, TypeType } from "./ast.ts"
+import { OurModule } from "../../grammar.ts"
 
 const { Const, Tuple, Union, Ident, Ref, Array, Optional } = Runtime
 
@@ -61,44 +60,6 @@ function processComments(input: string): string {
     }
     return output
 }
-
-Deno.test({
-    name: "processComments: general exercise",
-    fn() {
-        const test = `a // hello
-b c d e
-f // g h i j k
-a /* aaaaaaaaa */ f
-a /* aaaaaa
-
-
-
-aaa */ f
-`
-        assertEquals(processComments(test), "a \nb c d e\nf \na  f\na  f\n")
-    },
-})
-
-Deno.test({
-    name: "processComments: empty string passthrough",
-    fn() {
-        assertEquals(processComments(''), '')
-    },
-})
-
-Deno.test({
-    name: "processComments: short string",
-    fn() {
-        assertEquals(processComments('a'), 'a')
-    },
-})
-
-Deno.test({
-    name: "processComments: slashes are still good",
-    fn() {
-        assertEquals(processComments('a / b'), 'a / b')
-    },
-})
 
 const Tokens = {
     Arrow: Const('->'),
@@ -274,76 +235,4 @@ export const Language = new OurModule({
         ],
         raw => ({ type: ExprType.LiteralBool, value: raw == "true" } satisfies Expr),
     ),
-})
-
-Deno.test({
-    name: "Language.Parse: parsing one of each type of Expr and Type",
-    fn() {
-        assertEquals(
-            Language.Parse('Expr', `
-                let x: fn[int, bool] =
-                    y: int -> odd(y)
-                in if x(2)
-                    then false
-                    else true
-                `.trim()),
-            [{
-                type: ExprType.Let,
-                binding: {
-                    name: "x",
-                    type: {
-                        type: TypeType.Function,
-                        argumentType: {
-                            type: TypeType.Int,
-                        },
-                        returnType: {
-                            type: TypeType.Bool,
-                        },
-                    },
-                },
-                boundIn: {
-                    type: ExprType.Ternary,
-                    condition: {
-                        type: ExprType.Application,
-                        lambda: {
-                            type: ExprType.Var,
-                            name: "x",
-                        },
-                        argument: {
-                            type: ExprType.LiteralInt,
-                            value: 2,
-                        },
-                    },
-                    positive: {
-                        type: ExprType.LiteralBool,
-                        value: false,
-                    },
-                    negative: {
-                        type: ExprType.LiteralBool,
-                        value: true,
-                    },
-                },
-                boundTo: {
-                    type: ExprType.Abstraction,
-                    binding: {
-                        name: "y",
-                        type: {
-                            type: TypeType.Int,
-                        },
-                    },
-                    body: {
-                        type: ExprType.Application,
-                        lambda: {
-                            type: ExprType.Var,
-                            name: "odd",
-                        },
-                        argument: {
-                            type: ExprType.Var,
-                            name: "y",
-                        },
-                    },
-                },
-            }, ""],
-        )
-    }
 })

@@ -1,5 +1,5 @@
-import { Expr, ExprType, Ident } from "./ast.ts";
-import { CORE_VALUES } from "./core.ts";
+import { Expr, ExprType, Ident } from "./ast.ts"
+import { CORE_VALUES } from "./core.ts"
 
 
 export enum ValueType {

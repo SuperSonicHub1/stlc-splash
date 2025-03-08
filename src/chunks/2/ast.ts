@@ -12,5 +12,5 @@ export type Expr =
     | { type: ExprType.LiteralInt, value: number }
     | { type: ExprType.LiteralBool, value: boolean }
 
-export type Ident = string;
+export type Ident = string
 export type Binding = { name: Ident }

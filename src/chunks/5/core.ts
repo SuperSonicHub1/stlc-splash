@@ -1,6 +1,6 @@
-import { Ident, Type, TypeType } from "./ast.ts";
-import { Value, ValueType } from "./eval.ts";
-import { inspectValue } from "../../inspect.ts";
+import { Ident, Type, TypeType } from "./ast.ts"
+import { Value, ValueType } from "./eval.ts"
+import { inspectValue } from "../../inspect.ts"
 
 const typename = (v: Value) => ({ number: "int", boolean: "bool", object: "fn" } as Record<string, string>)[typeof v]
 const expectInt = (v: Value) => (v.type === ValueType.Int) ? v.value : (() => { throw new Error("Runtime eval error: expected type int found " + typename(v)) })()
@@ -15,10 +15,10 @@ const T = {
 
 const t_fn_int_bool = T.fn(T.int, T.bool)
 const t_fn_int_int = T.fn(T.int, T.int)
-const t_fn_bool_bool = T.fn(T.int, T.int)
+const t_fn_bool_bool = T.fn(T.bool, T.bool)
 const t_fn_int_int_int = T.fn(T.int, T.fn(T.int, T.int))
-const t_fn_int_int_bool = T.fn(T.int, T.fn(T.int, T.int))
-const t_fn_bool_bool_bool = T.fn(T.int, T.fn(T.int, T.int))
+const t_fn_int_int_bool = T.fn(T.int, T.fn(T.int, T.bool))
+const t_fn_bool_bool_bool = T.fn(T.bool, T.fn(T.bool, T.bool))
 
 type JSValue = number | boolean | Value
 

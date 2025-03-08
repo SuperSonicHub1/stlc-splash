@@ -1,7 +1,7 @@
-import katex from "npm:katex";
+import katex from "npm:katex"
 
 const stylesheet =
-  `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css" integrity="sha384-zh0CIslj+VczCZtlzBcjt5ppRcsAmDnRem7ESsYwWwg3m/OaJ2l4x7YBZl9Kxxib" crossorigin="anonymous">`;
+  `<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.21/dist/katex.min.css" integrity="sha384-zh0CIslj+VczCZtlzBcjt5ppRcsAmDnRem7ESsYwWwg3m/OaJ2l4x7YBZl9Kxxib" crossorigin="anonymous">`
 
 export enum InspectOutput {
   Plain,
@@ -12,16 +12,16 @@ export function displayJupyterInspector<T>(
   value: T,
   displayMode: boolean = true,
 ): Record<string, string> {
-  const plain = inspect(value, InspectOutput.Plain);
-  const latex = inspect(value, InspectOutput.Latex);
-  return { ...richLatexGen(latex, displayMode), "text/plain": plain };
+  const plain = inspect(value, InspectOutput.Plain)
+  const latex = inspect(value, InspectOutput.Latex)
+  return { ...richLatexGen(latex, displayMode), "text/plain": plain }
 }
 
 function richLatexGen(
   code: string,
   displayMode: boolean = false,
 ): Record<string, string> {
-  const braces = displayMode ? "$$" : "$";
+  const braces = displayMode ? "$$" : "$"
   return {
     "text/plain": code,
     "text/markdown": `${braces}${code}${braces}`,
@@ -29,17 +29,17 @@ function richLatexGen(
       throwOnError: false,
       displayMode,
     }),
-  };
+  }
 }
 
 /**
  * Simple class for testing {@link richLatexGen}.
  */
 export class Latex {
-  constructor(private code: string, private displayMode: boolean = false) {}
+  constructor(private code: string, private displayMode: boolean = false) { }
 
   [Symbol.for("Jupyter.display")]() {
-    return richLatexGen(this.code, this.displayMode);
+    return richLatexGen(this.code, this.displayMode)
   }
 }
 
@@ -51,13 +51,13 @@ export class Inspect<T> {
     private inspector: (value: T, output: InspectOutput) => string,
     private value: T,
     private displayMode: boolean = true,
-  ) {}
+  ) { }
 
   [Symbol.for("Jupyter.display")]() {
     return displayJupyterInspector(
       this.inspector,
       this.value,
       this.displayMode,
-    );
+    )
   }
 }

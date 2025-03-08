@@ -1,4 +1,5 @@
-import { Expr, ExprType, Ident } from "./ast.ts";
+import { Expr, ExprType, Ident } from "./ast.ts"
+import { CORE_VALUES } from "./core.ts";
 
 
 export enum ValueType {
@@ -16,7 +17,7 @@ export type Value =
 export type Context = Record<Ident, Value>
 
 
-export function evaluate(expr: Expr, context: Context = {}): Value {
+export function evaluate(expr: Expr, context: Context = CORE_VALUES()): Value {
     switch (expr.type) {
         case ExprType.Application: {
             const lambda = evaluate(expr.lambda, context)

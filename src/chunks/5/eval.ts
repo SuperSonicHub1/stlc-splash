@@ -1,5 +1,5 @@
-import { Expr, ExprType, Ident } from "./ast.ts";
-import { CORE_VALUES } from "./core.ts";
+import { Expr, ExprType, Ident } from "./ast.ts"
+import { CORE_VALUES } from "./core.ts"
 
 
 export enum ValueType {
@@ -55,10 +55,10 @@ export function evaluate(expr: Expr, context: Context = CORE_VALUES()): Value {
         // @impl
         case ExprType.Ternary: {
             const condition = evaluate(expr.condition, context)
-            if (typeof condition !== "boolean") {
-                throw new Error("Runtime eval error: type " + (typeof condition) + " cannot be used as a condition")
+            if (condition.type !== ValueType.Bool) {
+                throw new Error("Runtime eval error: type " + (ValueType[condition.type]) + " cannot be used as a condition")
             }
-            return evaluate(condition ? expr.positive : expr.negative, context)
+            return evaluate(condition.value ? expr.positive : expr.negative, context)
         }
         case ExprType.LiteralInt: {
             return { type: ValueType.Int, value: expr.value }

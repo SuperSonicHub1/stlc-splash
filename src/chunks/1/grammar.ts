@@ -1,7 +1,8 @@
 import { Runtime } from 'jsr:@kawcco/parsebox'
-import { OurModule } from "../../grammar.ts";
-import { Expr, ExprType } from "./ast.ts";
-import { assertEquals } from "jsr:@std/assert/equals";
+import { OurModule } from "../../grammar.ts"
+import { Expr, ExprType } from "./ast.ts"
+import { describe, it } from "@std/testing/bdd"
+import { expect } from "@std/expect/expect"
 
 const { Const, Tuple, Union, Ref, Array, Optional } = Runtime
 
@@ -53,12 +54,10 @@ export const Language = new OurModule({
     ),
 })
 
-// TODO(supersonichub1): Fix
 /// @impl
-Deno.test({
-    name: "`-9` is -9",
-    fn() {
-        const result: any = Language.Parse('Expr', '-9')[0]
-        assertEquals(result.value as number, -9)
-    },
+describe("grammar", () => {
+    it("`-9` is -9", () => {
+        const result = Language.Parse('Expr', '-9')[0]! as Expr
+        expect(result.value).toBe(-9)
+    })
 })

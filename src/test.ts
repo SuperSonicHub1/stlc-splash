@@ -1,9 +1,9 @@
-import { describe, it } from "@std/testing/bdd";
-import { Language } from "./grammar.ts";
-import { Expr, Type } from "./ast.ts";
-import { evaluate } from "./eval.ts";
-import { expect } from "@std/expect";
-import { solveTypes } from "./type.ts";
+import { describe, it } from "@std/testing/bdd"
+import { Language } from "./grammar.ts"
+import { Expr, Type } from "./ast.ts"
+import { evaluate } from "./eval.ts"
+import { expect } from "@std/expect"
+import { solveTypes } from "./type.ts"
 
 describe("integration test of parse-eval", () => {
     const parse = (code: string) => Language.Parse("Expr", code) as [Expr, string] | []

@@ -1,6 +1,6 @@
 import { Runtime } from 'jsr:@kawcco/parsebox'
-import { Binding, Expr, ExprType } from "./ast.ts";
-import { OurModule } from "../../grammar.ts";
+import { Binding, Expr, ExprType } from "./ast.ts"
+import { OurModule } from "../../grammar.ts"
 
 const { Const, Tuple, Union, Ident, Ref, Array, Optional } = Runtime
 

@@ -28,7 +28,7 @@ export type Type =
     | { type: TypeType.Function, argumentType: Type, returnType: Type }
 
 
-export type Ident = string;
+export type Ident = string
 export type Binding = { name: Ident, type: Type }
 export type BindingUntyped = { name: Ident, type: Type | null }
 

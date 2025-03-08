@@ -1,9 +1,9 @@
-import { Runtime } from "@kawcco/parsebox";
-import type { Module, IParser } from "@kawcco/parsebox";
-import { assertEquals } from "jsr:@std/assert";
-import { InspectOutput } from "./notebook.ts";
-import { Binding, BindingUntyped, Expr, ExprType, Type, TypeType } from "./ast.ts";
-import { Value, ValueType } from "./eval.ts";
+import { Runtime } from "@kawcco/parsebox"
+import type { Module, IParser } from "@kawcco/parsebox"
+import { assertEquals } from "jsr:@std/assert"
+import { InspectOutput } from "./notebook.ts"
+import { Binding, BindingUntyped, Expr, ExprType, Type, TypeType } from "./ast.ts"
+import { Value, ValueType } from "./eval.ts"
 
 export function inspectGrammar(module: Module, output: InspectOutput = InspectOutput.Plain): string {
 	// @ts-ignore Deno is being annoying.
@@ -63,7 +63,7 @@ export function inspectParser(x: IParser, output: InspectOutput = InspectOutput.
 			: `<${x.ref}>`
 	}
 	else {
-		throw new Error(`Unexpected parser type: ${x.type}`);
+		throw new Error(`Unexpected parser type: ${x.type}`)
 	}
 }
 

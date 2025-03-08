@@ -1,4 +1,4 @@
-import { Expr, ExprType } from "./ast.ts";
+import { Expr, ExprType } from "./ast.ts"
 
 
 export enum ValueType {

@@ -2,7 +2,7 @@ import { describe, it } from "jsr:@std/testing/bdd"
 import { expect } from "jsr:@std/expect"
 
 
-import { Runtime } from "jsr:@kawcco/parsebox";
+import { Runtime } from "jsr:@kawcco/parsebox"
 import {
   Binding,
   BindingUntyped,
@@ -10,11 +10,11 @@ import {
   ExprType,
   Type,
   TypeType,
-} from "./ast.ts";
-import { inspectGrammar } from "./inspect.ts";
-import { displayJupyterInspector } from "./notebook.ts";
+} from "./ast.ts"
+import { inspectGrammar } from "./inspect.ts"
+import { displayJupyterInspector } from "./notebook.ts"
 
-const { Const, Tuple, Union, Ident, Module, Ref, Array, Optional } = Runtime;
+const { Const, Tuple, Union, Ident, Module, Ref, Array, Optional } = Runtime
 
 /**
  * Pre-processing step for parsing that removes C-style single— and
@@ -29,8 +29,8 @@ function processComments(input: string): string {
     Multiple,
   }
 
-  let output = "";
-  let state = CommentState.None;
+  let output = ""
+  let state = CommentState.None
   for (let i = 0; i < input.length; i++) {
     switch (state) {
       case CommentState.None:
@@ -38,38 +38,38 @@ function processComments(input: string): string {
         if (input.length - i >= 2) {
           // Single line comment
           if (input[i] == "/" && input[i + 1] == "/") {
-            state = CommentState.Single;
+            state = CommentState.Single
             // Skip one char extra
-            i++;
-            continue;
+            i++
+            continue
           }
           // Multi-line comment
           if (input[i] == "/" && input[i + 1] == "*") {
-            state = CommentState.Multiple;
+            state = CommentState.Multiple
             // Skip one char extra
-            i++;
-            continue;
+            i++
+            continue
           }
         }
-        output += input[i];
-        break;
+        output += input[i]
+        break
       case CommentState.Single:
         if (input[i] == "\n") {
-          state = CommentState.None;
+          state = CommentState.None
           // Include the newline
-          output += input[i];
+          output += input[i]
         }
-        break;
+        break
       case CommentState.Multiple:
         if (input.length - i >= 2 && input[i] == "*" && input[i + 1] == "/") {
-          state = CommentState.None;
+          state = CommentState.None
           // Skip one char extra
-          i++;
+          i++
         }
-        break;
+        break
     }
   }
-  return output;
+  return output
 }
 
 describe("processComments", () => {
@@ -120,14 +120,14 @@ const Tokens = {
   Else: Const("else"),
   True: Const("true"),
   False: Const("false"),
-};
+}
 
 /**
  * Extension of {@link Module} for the lecture.
  */
 export class OurModule extends Module {
   [Symbol.for("Jupyter.display")]() {
-    return displayJupyterInspector(inspectGrammar, this);
+    return displayJupyterInspector(inspectGrammar, this)
   }
 }
 
@@ -142,11 +142,11 @@ export const Language = new OurModule({
       ], ([, expr]) => expr)),
     ],
     ([base, applicationArgs]) => {
-      let expr = base;
+      let expr = base
       for (const argument of applicationArgs) {
-        expr = { type: ExprType.Application, lambda: expr, argument };
+        expr = { type: ExprType.Application, lambda: expr, argument }
       }
-      return expr;
+      return expr
     },
   ),
   ExprWithoutApplication: Union(
@@ -296,7 +296,7 @@ export const Language = new OurModule({
       value: raw == "true",
     } satisfies Expr),
   ),
-});
+})
 
 describe("Language.Parse", () => {
   // @impl
@@ -309,7 +309,7 @@ describe("Language.Parse", () => {
       },
       argument: {
         type: ExprType.Var,
-        name: "x",
+        name: "y",
       }
     } satisfies Expr, ""])
   })

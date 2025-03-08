@@ -1,32 +1,32 @@
-import { describe, it } from "@std/testing/bdd";
-import { Expr, Type } from "./ast.ts";
-import { Context, evaluate, Value } from "./eval.ts";
-import { Language, OurModule } from "./grammar.ts";
-import { inspectValue, inspectType } from "./inspect.ts";
-import { expect } from "@std/expect/expect";
-import { solveTypes } from "./type.ts";
+import { describe, it } from "@std/testing/bdd"
+import { Expr, Type } from "./ast.ts"
+import { Context, evaluate, Value } from "./eval.ts"
+import { Language, OurModule } from "./grammar.ts"
+import { inspectValue, inspectType } from "./inspect.ts"
+import { expect } from "@std/expect/expect"
+import { solveTypes } from "./type.ts"
 
 type SolveTypes = (expr: Expr, context?: Record<string, Type>) => Type
 type Evaluate = (expr: Expr, context?: Context) => Value
 
-function replIteration(code: string, solveTypes: SolveTypes, Language: OurModule, evaluate: Evaluate): string {
+function replIteration(code: string, solveTypes: SolveTypes | null, Language: OurModule, evaluate: Evaluate): string {
     const parseResult = Language.Parse("Expr", code) as [Expr, string] | []
     if (parseResult.length === 0 || parseResult[1].trim().length > 0) {
         return "Syntax error" + (parseResult[1]?.length ?? 0 > 0 ? `: cannot match '...${parseResult[1]}'` : "")
     }
     const [ast] = parseResult
-    let type: Type
+    let type: Type | null
     try {
-        type = solveTypes(ast)
+        type = solveTypes?.(ast) ?? null
     } catch (e) {
         return "Type error: " + (e as Error).message
     }
     const value = evaluate(ast)
 
-    return `${inspectValue(value)} : ${inspectType(type)}`
+    return type != null ? `${inspectValue(value)} : ${inspectType(type)}` : `${inspectValue(value)}`
 }
 
-export async function repl(solveTypes: SolveTypes, Language: OurModule, evaluate: Evaluate) {
+export async function repl(solveTypes: SolveTypes | null, Language: OurModule, evaluate: Evaluate) {
     while (true) {
         const code = prompt("> ")?.trim()
         if (code == null || code === "") break

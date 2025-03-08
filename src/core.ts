@@ -1,9 +1,9 @@
 import { describe, it } from "jsr:@std/testing/bdd"
 import { expect } from "jsr:@std/expect"
 
-import { Type, TypeType } from "./ast.ts";
-import { Value, ValueType } from "./eval.ts";
-import { inspectValue } from "./inspect.ts";
+import { Type, TypeType } from "./ast.ts"
+import { Value, ValueType } from "./eval.ts"
+import { inspectValue } from "./inspect.ts"
 
 const typename = (v: Value) => ({ number: "int", boolean: "bool", object: "fn" } as Record<string, string>)[typeof v]
 const expectInt = (v: Value) => (v.type === ValueType.Int) ? v.value : (() => { throw new Error("Runtime eval error: expected type int found " + typename(v)) })()

@@ -1,5 +1,5 @@
-import { inspectType } from "../../inspect.ts";
-import { Expr, ExprType, Type, TypeType } from "./ast.ts";
+import { inspectType } from "../../inspect.ts"
+import { Expr, ExprType, Type, TypeType } from "./ast.ts"
 
 export function solveTypes(expr: Expr, context: Record<string, Type> = {}): Type {
     switch (expr.type) {
