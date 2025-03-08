@@ -129,9 +129,11 @@ add(1, 1) // => 2
 
 ===
 
-## Lambda Calculus
+## Intro to Lambda Calculus
 
-$$\lambda x . x$$
+```
+λx . x
+```
 
 "LC" for short. Occasionally written as "λ-calculus" or "λC" by nerds.
 
@@ -141,19 +143,159 @@ Created in the 1930s at Princeton University by legendary mathematician Alonzo C
 
 Captures all of computation in a few elegant* rules. <!-- .element: class="fragment" -->
 
---
+===
 
 ### A Taste of LC
 
-We will return to syntax and semantics when we start implementing the LC.
+In LC, the only things you can construct are **lambdas**, functions of one *argument* that return their inner expression, the *body*:
+
+```ts
+x -> x
+```
+
+Figure 1: The identity function.
+
+--
+
+With **application**, we can pass values to lambdas by "calling" them.
+
+```ts
+(x -> x)(y)
+// evaluates to…
+y
+```
+
+Figure 2: Application of the identity function.
+
+--
+
+And that's it! With just these two ideas, Church realized that much of computer science can be described.
+
+Let's evaluate some expressions by hand to make sure we understand this thing.
+
+--
+
+#### Syntax
+
+**Exercise 4**: Determine if the following strings *look* right. We'll let you know when to shout out an answer.
+
+<!-- 
+Go to blackboard!
+
+Warmup: x -> x [valid]
+Parentheses: (x -> x) [valid]
+Different variable name: y -> y [valid]
+Long variable names: abc -> abc [valid]
+Free variables: x -> y [valid]
+Empty body: x -> [invalid]
+Empty argument: -> x [invalid]
+Two arguments: (x, y) -> y [invalid]
+Empty string: "" [invalid]
+Two expressions: x y [invalid]
+Application 1: x(z) [valid]
+Application 2: (x)z [invalid]
+Application 3: (x -> x)(z) [valid]
+Application 4: x -> x(z) [valid; equiv to x -> (x(z))]
+-->
+
+--
+
+A string is a *syntactically valid* LC program if it fulfills the following properties:
+
+- It must contain exactly one expression. <!-- .element: class="fragment" -->
+- That expression is either a lambda declaration, an **abstraction**; an application; or a variable. <!-- .element: class="fragment" -->
+- An abstraction has exactly one argument and exactly one expression as its body, separated by an arrow. <!-- .element: class="fragment" -->
+- An application is an expression next to another encased in parentheses.
+- We can use parentheses to control order of operations. <!-- .element: class="fragment" -->
+
+To think about: How can we more precisely state what is a syntactically valid string? <!-- .element: class="fragment" -->
+
+<!-- Pause for questions (15 seconds!). -->
+
+--
+
+#### Execution Semantics
+
+Now that we know what programs we can write, let's begin to understand what they can do.
+
+**Exercise 5**: Simplify the following expressions. We'll let you know when to shout out an answer.
+
+<!-- 
+Go to blackboard!
+
+Warmup: x -> x => x -> x
+Variables: x => x
+Substitution 1: (x -> x)(y) => y
+Partial application: (x -> (y -> x(y)))(z) => y -> z(y)
+Full application: (x -> (y -> x(y)))(z)(w) => (y -> z(y))(w) => z(w)
+Closure 1: (x -> (x -> x))(y) => x -> x
+!=> x -> y
+Closure 2: (x -> (z -> x))(z) => y -> y(z)
+!=> z -> z(z)
+-->
+
+--
+
+Execution in the lambda calculus is just *simplification*!
+
+<!-- Pause for questions. (15 seconds!) -->
+
+- Abstractions and variables cannot be simplified further; they are **values**. <!-- .element: class="fragment" -->
+- Two abstractions are equivalent if they differ only in their arguments. <!-- .element: class="fragment" -->
+- Application consists of taking your input expression, and putting it everywhere the argument is in the body expression. <!-- .element: class="fragment" -->
+- We need to be careful about re-using variable names in an expression; the rules that govern simplification in this regard are called **closure**. <!-- .element: class="fragment" -->
+
+To think about: How would we implement simplification as a algorithm on a computer? <!-- .element: class="fragment" -->
+
+<!-- Pause for questions (15 seconds!). -->
+
+===
+
+The lambda calculus is cool and all, but it kinda sucks as a programming language. *There's only functions*!
+
+We can crudely use abstractions as a way to represent data like numbers (see: Church numerals), but they are hard to work with and quite slow computationally. <!-- element: class="fragment" -->
+
+*Can we just drop stuff like booleans and integers into the lambda calculus* <!-- element: class="fragment" -->
+
+--
 
 ### Simply Typed Lambda Calculus
 
+```
+λx : τ . x
+```
+
+The **simply typed lambda calculus** (STLC) gives us a way forward!
+
+Created by Church (still) at Princeton in 1940. <!-- .element: class="fragment" -->
+
+Introduces **types** to the LC, allowing us to support data beyond abstractions! <!-- .element: class="fragment" -->
+
+Also makes it harder to write nonsense programs by *type-checking* them. <!-- .element: class="fragment" -->
+
 ===
 
-## Substitution and Pattern Matching
+### A Taste of Pai
 
+The language based on the STLC we'll be developing today.
 
+<!-- TODO(supersonichub1): Show some nice example programs. -->
 
 ===
+
+### End of Section
+
+**Exercise 6**: Look at some cats to wash down all the math you just ate (three (3) minute break).
+
+===
+
+## Writing a PL
+
+--
+
+### Chunk N: <>
+
+===
+
+## What next?
 
