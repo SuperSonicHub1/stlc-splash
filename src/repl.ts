@@ -32,12 +32,7 @@ export async function repl(solveTypes: SolveTypes | null, Language: OurModule, e
         if (code == null || code === "") break
 
         const result = replIteration(code, solveTypes, Language, evaluate)
-
-        await Deno.jupyter.broadcast("display_data", {
-            data: { "text/plain": `> ${code}\n  = ${result}` },
-            metadata: {},
-            transient: { display_id: "progress" }
-        })
+        console.log(`> ${code}\n  = ${result}`)
     }
 
 }
