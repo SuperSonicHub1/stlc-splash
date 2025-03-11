@@ -3,32 +3,21 @@ title: Reveal-MD
 theme: serif  # try solarized, serif or white
 ---
 
-// global
-
-```css
-.container {
-  overflow: scroll;
-  max-height: 90vh;
-}
-```
-
-===
-
 # Lambda Calculus from Scratch
 
 MIT ESP Splash 2025 • M03 16 2025 Skylar N. Huber, Kyle A. Williams
 
-===
+--
 
 ## Abstract
 
-- We are going to write a _programming language_ (PL) from nothing!
-- We will use the canonical model for PLs, the _lambda calculus_ (LC), as a
-  guide.
-- We will extend the LC to support "modern" programming features like `let` and
-  `if`.
-- Along the way, we will implement good software development practices and
-  _y'all_ will write some code!
+We are going to write a _programming language_ (PL) from nothing! <!-- .element: class="fragment" data-fragment-index="1" -->
+
+We will use the canonical model for PLs, the _lambda calculus_ (LC), as a guide. <!-- .element: class="fragment" -->
+
+We will extend the LC to support "modern" programming features like `let` and `if`. <!-- .element: class="fragment" -->
+
+Along the way, we will implement good software development practices and _y'all_ will write some code! <!-- .element: class="fragment" -->
 
 --
 
@@ -75,7 +64,7 @@ MIT ESP Splash 2025 • M03 16 2025 Skylar N. Huber, Kyle A. Williams
 
 **Exercise 1**: Take five (5) minutes to talk to the people around you. Share your name, pronouns (if any), and what you do for fun.
 
-===
+--
 
 ## Why study programming languages?
 
@@ -85,13 +74,15 @@ MIT ESP Splash 2025 • M03 16 2025 Skylar N. Huber, Kyle A. Williams
 
 --
 
-All software is written in programming languages. If we can design better programming languages, perhaps we can make it easier to write software! <!-- .element: class="fragment" -->
+All software is written in programming languages. If we can design better programming languages, perhaps we can make it easier to write software!
 
-- Writing more correct software <!-- .element: class="fragment" -->
-- Making software more accessible <!-- .element: class="fragment" -->
-- Solving challenging domain-specific problems <!-- .element: class="fragment" -->
+Writing more correct software <!-- .element: class="fragment" -->
 
-===
+Making software more accessible <!-- .element: class="fragment" -->
+
+Solving challenging domain-specific problems <!-- .element: class="fragment" -->
+
+--
 
 ## What *is* a programming language?
 
@@ -127,23 +118,24 @@ function add(x: number, y: number) {
 add(1, 1) // => 2
 ```
 
-===
+--
 
 ## Intro to Lambda Calculus
 
-```
-λx . x
-```
+<img width="30%" src="https://wikimedia.org/api/rest_v1/media/math/render/svg/7aa284718745826bd142338fc1e6110582f46583" />
+
 
 "LC" for short. Occasionally written as "λ-calculus" or "λC" by nerds.
-
-![Man in suit smiling.](https://upload.wikimedia.org/wikipedia/en/a/a6/Alonzo_Church.jpg)
 
 Created in the 1930s at Princeton University by legendary mathematician Alonzo Church, thesis advisor of the equally legendary Alan Turing. <!-- .element: class="fragment" -->
 
 Captures all of computation in a few elegant* rules. <!-- .element: class="fragment" -->
 
-===
+--
+
+![Man in suit smiling.](https://upload.wikimedia.org/wikipedia/en/a/a6/Alonzo_Church.jpg)
+
+--
 
 ### A Taste of LC
 
@@ -202,11 +194,15 @@ Application 4: x -> x(z) [valid; equiv to x -> (x(z))]
 
 A string is a *syntactically valid* LC program if it fulfills the following properties:
 
-- It must contain exactly one expression. <!-- .element: class="fragment" -->
-- That expression is either a lambda declaration, an **abstraction**; an application; or a variable. <!-- .element: class="fragment" -->
-- An abstraction has exactly one argument and exactly one expression as its body, separated by an arrow. <!-- .element: class="fragment" -->
-- An application is an expression next to another encased in parentheses.
-- We can use parentheses to control order of operations. <!-- .element: class="fragment" -->
+It must contain exactly one expression. <!-- .element: class="fragment" -->
+
+That expression is either a lambda declaration, an **abstraction**; an **application**; or a **variable**. <!-- .element: class="fragment" -->
+
+An abstraction has exactly one argument and exactly one expression as its body, separated by an arrow. <!-- .element: class="fragment" -->
+
+An application is an expression next to another encased in parentheses. <!-- .element: class="fragment" -->
+
+We can use parentheses to control order of operations. <!-- .element: class="fragment" -->
 
 To think about: How can we more precisely state what is a syntactically valid string? <!-- .element: class="fragment" -->
 
@@ -240,30 +236,31 @@ Execution in the lambda calculus is just *simplification*!
 
 <!-- Pause for questions. (15 seconds!) -->
 
-- Abstractions and variables cannot be simplified further; they are **values**. <!-- .element: class="fragment" -->
-- Two abstractions are equivalent if they differ only in their arguments. <!-- .element: class="fragment" -->
-- Application consists of taking your input expression, and putting it everywhere the argument is in the body expression. <!-- .element: class="fragment" -->
-- We need to be careful about re-using variable names in an expression; the rules that govern simplification in this regard are called **closure**. <!-- .element: class="fragment" -->
+Abstractions and variables cannot be simplified further; they are **values**. <!-- .element: class="fragment" -->
+
+Two abstractions are equivalent if they differ only in their arguments. <!-- .element: class="fragment" -->
+
+Application consists of taking your input expression, and putting it everywhere the argument is in the body expression. <!-- .element: class="fragment" -->
+
+We need to be careful about re-using variable names in an expression; the rules that govern simplification in this regard are called **closure**. <!-- .element: class="fragment" -->
 
 To think about: How would we implement simplification as a algorithm on a computer? <!-- .element: class="fragment" -->
 
 <!-- Pause for questions (15 seconds!). -->
 
-===
+--
 
-The lambda calculus is cool and all, but it kinda sucks as a programming language. *There's only functions*!
+The lambda calculus is cool and all, but it kinda sucks as a programming language. *There's only functions!*
 
-We can crudely use abstractions as a way to represent data like numbers (see: Church numerals), but they are hard to work with and quite slow computationally. <!-- element: class="fragment" -->
+We can crudely use abstractions as a way to represent data like numbers (see: Church numerals), but they are hard to work with and quite slow computationally. <!-- .element: class="fragment" -->
 
-*Can we just drop stuff like booleans and integers into the lambda calculus* <!-- element: class="fragment" -->
+*Can we just drop stuff like booleans and integers into the lambda calculus?* <!-- .element: class="fragment" -->
 
 --
 
 ### Simply Typed Lambda Calculus
 
-```
-λx : τ . x
-```
+<img width="30%" src="https://wikimedia.org/api/rest_v1/media/math/render/svg/d2115231ef049e19d47c1dffcc25a9c31d70d6d1" />
 
 The **simply typed lambda calculus** (STLC) gives us a way forward!
 
@@ -273,29 +270,68 @@ Introduces **types** to the LC, allowing us to support data beyond abstractions!
 
 Also makes it harder to write nonsense programs by *type-checking* them. <!-- .element: class="fragment" -->
 
-===
+--
 
 ### A Taste of Pai
 
 The language based on the STLC we'll be developing today.
 
-<!-- TODO(supersonichub1): Show some nice example programs. -->
+```ts
+// Logical implication
+let
+  implies: fn[bool,fn[bool, bool]]
+    = x: bool -> y: bool -> or(not(x))(y)
+in implies(true)(false)
+//  = false : boolean
+```
 
-===
+--
+
+```ts
+// Polynomials
+let
+  polynomial: fn[int, fn[int, fn[int, fn[int, int]]]]
+    = a: int -> b: int -> c: int -> x: int -> 
+    add(mul(a)(mul(x)(x)))(add(mul(b)(x))(c))
+in polynomial(1)(2)(3)(4)
+//  = 27 : int
+```
+
+--
 
 ### End of Section
 
 **Exercise 6**: Look at some cats to wash down all the math you just ate (three (3) minute break).
 
-===
+--
 
 ## Writing a PL
+
+Armed with knowledge of the STLC, we go off to write an impelementation…
+
+--
+
+### Introduction to Parsing
+
+One of the most important parts of creating a language is deciding *how it shall be written*.
+
+Describing this is the purpose of a **grammar**. Think of it as a bouncer that decides whether a string gets in. <!-- .element: class="fragment" -->
+
+The act of determining if a string is valid (and later transforming it into something more useful), is called **parsing**. <!-- .element: class="fragment" -->
+
+Huh, we've already had some practice with this earlier! <!-- .element: class="fragment" -->
+
+--
+
+Grammars can be described in many ways. <!-- Us talking it out on the board earlier is very valid! -->
+
+One way they can be described is through **Backus-Naur form**, or BNF, a notation created by computer scientists John Backus and Peter Naur in the 1960s.
 
 --
 
 ### Chunk N: <>
 
-===
+--
 
 ## What next?
 
