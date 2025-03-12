@@ -329,7 +329,165 @@ One way they can be described is through **Backus-Naur form**, or BNF, a notatio
 
 --
 
-### Chunk N: <>
+Let's work through the syntax and semantics of BNF on the blackboard.
+
+<!-- 
+Talk through what each operator does; work through examples like in exercises 4, 5.
+
+On blackboard:
+
+Legend for BNF syntax:
+
+Expressions:
+- Strings: "cats"
+"cats" [valid]; "dogs" [invalid]
+- Tuple (sequences of expressions): "cats", "dogs", "geckos"
+"cats dogs geckos" [valid]; "cats geckos dogs" [invalid]
+- Union ("or"): "cats" | "dogs"
+"cats" [valid]; "dogs" [valid]; "geckos" [invalid]
+- Optional (expression or the empty string): "cats"? === ("cats" | "")
+"cats" [valid]; "cats cats cats cats" [valid]; "" [invalid]
+- Array: (zero or more of the expression) "cats"*
+Rules:
+- Declaration: <name> ::= expression
+- Reference: <name>
+<animal> ::= "cats" | "dogs"
+<sentence> ::= "I like" <animal>
+"I like cats" [valid]; "I like dogs" [valid]; ""
+
+
+We'll keep this on the board for your reference.
+-->
+
+--
+
+With that out of the way, y'all now have everything you need to start writing some code.
+
+Talk is cheap; **time for programming!**
+
+--
+
+## Chunk 1: Literals
+
+We'll first start by implementing a language even simpler than the untyped lambda calculus: one with integers, booleans, and nothing more.
+
+<!-- This is so y'all can get used to the loop of thinking through the design, and then expressing it in code. -->
+
+--
+
+How do we parse a number? A boolean?
+
+**Exercise 7**: Take two (2) to think through what the grammar would be for integers and booleans. <!-- .element: class="fragment" -->
+
+(Hint: Break down a number into its constituent parts, represent each with rules, and then combine them together with references.) <!-- .element: class="fragment" -->
+
+--
+
+<!--
+
+OK, what did y'all come up with? Well, I imagine saying a grammar out loud and y'all tell me if it looks right.
+
+Okay, so booleans look like this right?
+<boolean> ::= "true"
+[you forgot "false"!]
+Ah, my bad. :P
+<boolean> ::= "true" | "false"
+
+-->
+
+```
+<boolean> ::= "true" | "false"
+```
+
+<!--
+
+So, integers?
+
+[write -1234567890 on blackboard]
+
+They have this little dash which tells us they're negative, but it isn't always there. After that, we have one or more digits, the numerals zero through nine, which tell us the magnitude.
+
+So, we can write the parsing rule in two parts. First, we need to describe what a digit is:
+
+<digit> ::= "0" | "1" | "2" | … | "8" | "9"
+I leave out the middle ones because we don't have all day.
+-->
+
+--
+
+```
+<digit> ::= "0" | "1" | "2" | … | "8" | "9"
+```
+
+<!--
+
+Then we can describe what an integer is:
+<integer> ::= "-"? <digit> <digit>*
+
+We can use a tuple of <expr> and <expr>* to create a "one or more" rule.
+
+-->
+
+--
+
+```
+<digit> ::= "0" | "1" | "2" | … | "8" | "9"
+<integer> ::= "-"? <digit> <digit>*
+```
+
+<!-- Nice. -->
+
+--
+
+So, how do we simplify booleans and integers? 
+
+<!--
+
+Gesture to students?
+["you can't!"]
+
+Sounds about right!
+
+-->
+
+--
+
+```ts
+evaluate("true") == true
+evaluate("false") == false
+evaluate("1") == 1
+// extrapolate out to all other integers
+```
+
+<!--
+
+Can't simplify the core values of our language much further than this.
+
+Note that we're skipping over how the string "true" becomes the value `true`; this'll be made much more clear when we start coding.
+
+-->
+
+--
+
+Time to code!
+
+<!-- Now that we've gamed out the syntax and semantics of integers and booleans (at least those objects on their own), now we can begin writing our implementation! [switch to notebook] -->
+
+--
+
+## Chunk 2: Functions
+
+--
+
+## Chunk 3: Types
+
+--
+
+## Chunk 4: Builtins and FFI
+
+--
+
+## Chunk 5: A Real Programming Language
 
 --
 
