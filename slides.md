@@ -510,12 +510,15 @@ Alright, let's start working through this.
 So as we discussed earlier, an abstraction has a single argument and a body expression, separated by an arrow.
 So, something like this right?
 
-<abstraction> ::= <identifier> "->" <expr>
+<abstraction> ::= <binding> "->" <expr>
 
-Nice. Of course, we haven't defined <identifier> yet, but we can do that pretty easily:
+We'll call the argument in an abstraction a "binding."
+
+Nice. Of course, we haven't defined <biding> yet, but we can do that pretty easily; it's just a variable name:
 
 <letter> ::= "A" | "B" | … | "Z" | "a" | "b" | … | "z"
 <identifier> ::= <letter> <letter>*
+<binding> ::= <identifier>
 
 One might expect to be able to put more characters in their identifiers, but this'll do for now.
 
@@ -523,24 +526,77 @@ The other half of implementing the syntax of functions is application, but we fi
 
 <application> ::= <expr> "(" <expr> ")"
 
+Variables come along for the ride, too.
+
+<variable> ::= <identifier>
+
 Finally, since <abstraction> and <application> are both kinds of expression, our <expr> rule grows ever larger:
 
-<expr> ::= <boolean> | <integer> | <abstraction> | <application>
+<expr> ::= <boolean> | <integer> | <abstraction> | <application> | <variable>
 
 And that's it for functions! Nice.
 -->
 
 ```
-<abstraction> ::= <identifier> "->" <expr>
+<abstraction> ::= <binding> "->" <expr>
 <letter> ::= "A" | "B" | … | "Z" | "a" | "b" | … | "z"
 <identifier> ::= <letter> <letter>*
+<binding> ::= <identifier>
 <application> ::= <expr> "(" <expr> ")"
-<expr> ::= <boolean> | <integer> | <abstraction> | <application>
+<variable> ::= <identifier>
+<expr> ::= <boolean> | <integer> | <abstraction> | <application> | <variable>
 ```
 
 --
 
 So, how are we going to evaluate these guys?
+
+--
+
+<!--
+
+Let's focus on abstractions first. Looking at the grammar again, they have a binding and a body expression. Now that's Skylar shown you how we go from a string to abstract syntax to a value, hopefully y'all trust me to say something the abstract syntax of an abstraction looks like this:
+
+-->
+
+```ts
+type Abstraction = {
+  binding: Binding,
+  body: Expr,
+}
+
+type Binding = {
+  name: Ident,
+}
+```
+
+--
+
+<!--
+
+So, how do we evaluate this?
+In this case, `evaluate` acts as a passthrough.
+
+-->
+
+
+```ts
+let fn: Abstraction = ...;
+evaluate(fn) == fn
+
+// for your convenience…
+type Abstraction = { binding: Binding, body: Expr, }
+type Binding = { name: Ident, }
+```
+<!-- 
+
+We haven't done anything with the function yet, we're just passing it around.
+
+-->
+
+--
+
+
 
 --
 
