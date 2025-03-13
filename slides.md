@@ -172,6 +172,8 @@ Let's evaluate some expressions by hand to make sure we understand this thing.
 **Exercise 4**: Determine if the following strings *look* right. We'll let you know when to shout out an answer.
 
 <!-- 
+[!! Make sure this doesn't get erased in anticipation of chunk 1!!]
+
 Go to blackboard!
 
 Warmup: x -> x [valid]
@@ -217,6 +219,8 @@ Now that we know what programs we can write, let's begin to understand what they
 **Exercise 5**: Simplify the following expressions. We'll let you know when to shout out an answer.
 
 <!-- 
+[!! Make sure this doesn't get erased in anticipation of chunk 1!!]
+
 Go to blackboard!
 
 Warmup: x -> x => x -> x
@@ -299,7 +303,7 @@ in polynomial(1)(2)(3)(4)
 
 --
 
-### End of Section
+## Break 1
 
 **Exercise 6**: Look at some cats to wash down all the math you just ate (three (3) minute break).
 
@@ -307,7 +311,7 @@ in polynomial(1)(2)(3)(4)
 
 ## Writing a PL
 
-Armed with knowledge of the STLC, we go off to write an impelementation…
+Armed with knowledge of the STLC, we go off to write an implementation…
 
 --
 
@@ -377,7 +381,7 @@ We'll first start by implementing a language even simpler than the untyped lambd
 
 How do we parse a number? A boolean?
 
-**Exercise 7**: Take two (2) to think through what the grammar would be for integers and booleans. <!-- .element: class="fragment" -->
+**Exercise 7**: Take two (2) minutes to think through what the grammar would be for integers and booleans. <!-- .element: class="fragment" -->
 
 (Hint: Break down a number into its constituent parts, represent each with rules, and then combine them together with references.) <!-- .element: class="fragment" -->
 
@@ -439,6 +443,17 @@ We can use a tuple of <expr> and <expr>* to create a "one or more" rule.
 
 --
 
+<!-- We can combine them into a single <expr> rule: -->
+
+```
+<expr> ::= <boolean> | <integer>
+<boolean> ::= "true" | "false"
+<digit> ::= "0" | "1" | "2" | … | "8" | "9"
+<integer> ::= "-"? <digit> <digit>*
+```
+
+--
+
 So, how do we simplify booleans and integers? 
 
 <!--
@@ -461,7 +476,7 @@ evaluate("1") == 1
 
 <!--
 
-Can't simplify the core values of our language much further than this.
+Can't simplify the core values of Pai much further than this.
 
 Note that we're skipping over how the string "true" becomes the value `true`; this'll be made much more clear when we start coding.
 
@@ -476,6 +491,56 @@ Time to code!
 --
 
 ## Chunk 2: Functions
+
+Let's play the same "game" of syntax, semantics, and implementation to add functions to Pai.
+
+--
+
+<!-- Alright, you know the drill: -->
+
+**Exercise 8**: Take three (3) minutes to think about what a grammar for variables and functions would look like.
+
+(Hint: Refer to the examples on the board! Your grammar should depend on *and* modify `<expr>`.) <!-- .element: class="fragment" -->
+
+--
+
+<!--
+
+Alright, let's start working through this.
+So as we discussed earlier, an abstraction has a single argument and a body expression, separated by an arrow.
+So, something like this right?
+
+<abstraction> ::= <identifier> "->" <expr>
+
+Nice. Of course, we haven't defined <identifier> yet, but we can do that pretty easily:
+
+<letter> ::= "A" | "B" | … | "Z" | "a" | "b" | … | "z"
+<identifier> ::= <letter> <letter>*
+
+One might expect to be able to put more characters in their identifiers, but this'll do for now.
+
+The other half of implementing the syntax of functions is application, but we figured that earlier too: it's just an expression next to another expression in parentheses:
+
+<application> ::= <expr> "(" <expr> ")"
+
+Finally, since <abstraction> and <application> are both kinds of expression, our <expr> rule grows ever larger:
+
+<expr> ::= <boolean> | <integer> | <abstraction> | <application>
+
+And that's it for functions! Nice.
+-->
+
+```
+<abstraction> ::= <identifier> "->" <expr>
+<letter> ::= "A" | "B" | … | "Z" | "a" | "b" | … | "z"
+<identifier> ::= <letter> <letter>*
+<application> ::= <expr> "(" <expr> ")"
+<expr> ::= <boolean> | <integer> | <abstraction> | <application>
+```
+
+--
+
+So, how are we going to evaluate these guys?
 
 --
 
