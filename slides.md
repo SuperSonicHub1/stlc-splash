@@ -145,8 +145,6 @@ In LC, the only things you can construct are **lambdas**, functions of one *argu
 x -> x
 ```
 
-Figure 1: The identity function.
-
 --
 
 With **application**, we can pass values to lambdas by "calling" them.
@@ -156,8 +154,6 @@ With **application**, we can pass values to lambdas by "calling" them.
 // evaluates to…
 y
 ```
-
-Figure 2: Application of the identity function.
 
 --
 
@@ -551,52 +547,221 @@ And that's it for functions! Nice.
 
 So, how are we going to evaluate these guys?
 
---
+<!-- The core concept we need is closure.  -->
 
-<!--
+With closure! <!-- .element: class="fragment" -->
 
-Let's focus on abstractions first. Looking at the grammar again, they have a binding and a body expression. Now that's Skylar shown you how we go from a string to abstract syntax to a value, hopefully y'all trust me to say something the abstract syntax of an abstraction looks like this:
-
--->
-
-```ts
-type Abstraction = {
-  binding: Binding,
-  body: Expr,
-}
-
-type Binding = {
-  name: Ident,
-}
-```
+<!-- Let's go through it quickly by looking at some JavaScript. -->
 
 --
 
+**Exercise 9**: Consider the following JavaScript code.
+
+```ts
+let x = 5
+
+x // => ?
+```
+
+What will the last line evaluate to?
+
 <!--
 
-So, how do we evaluate this?
-In this case, `evaluate` acts as a passthrough.
+[Five!]
+
+Exactly; no surprises there.
 
 -->
 
+--
+
+<!-- What about this? -->
+
+**Exercise 10**: Consider the following JavaScript code.
 
 ```ts
-let fn: Abstraction = ...;
-evaluate(fn) == fn
+let x = 5 
 
-// for your convenience…
-type Abstraction = { binding: Binding, body: Expr, }
-type Binding = { name: Ident, }
+function f() {
+  let x = 6
+}
+f()
+
+x // => ?
 ```
+
+What will the last line evaluate to?
+
 <!-- 
 
-We haven't done anything with the function yet, we're just passing it around.
+[Still five!]
+
+Yup! Even though there's a variable named `x` in the body of `f`, that doesn't alter what `x` is at that top line. We call this phenomenon scope.
 
 -->
 
 --
 
+### Scope
 
+If, in a **scope**, you declare a variable `x` which was present in the previous scope, you get to start fresh *and* not affect the outer scope once you're done.
+
+
+```ts
+// start scope 0 (top level)
+
+let x = 5 
+
+function f() {
+  // start scope 1
+  let x = 6
+  // end scope 1
+}
+f() // enter and exit scope 1
+
+x // => 5
+
+// end scope 0
+```
+
+<!--
+
+[use chalk to mark contexts of scope]
+
+What's happening becomes much more obvious when we label when the scopes of our program.
+First, we enter scope 0, traditionally called the top level.
+We let `x` be `5`.
+Then, we call `f`, causing us to enter scope 1.
+We let a new, distinct `x` be `6`.
+Then we leave scope 1, which causes us to forget this new `x`.
+Now back in the top level, we check on our old `x`, and we find that it still contains 5.
+
+We should be pretty happy that this is the case, right?
+Imagine if you had to give each variable and binding in your program a unique name; that would be nightmarish.
+
+Let's take a look at a few more programs to make sure we fully get this.
+
+-->
+
+--
+
+**Exercise 11**: Consider the following JavaScript code.
+
+```ts
+let x = 5 
+
+function f() {
+  return x + 1
+}
+
+f() // => ?
+```
+
+What will the last line evaluate to?
+
+<!--
+
+[Six!]
+
+Yup. Because we didn't create a new `x` inside of the body of `f`, scope 1, Javascript gives us access to the `x` in the top level.
+
+-->
+
+--
+
+<!-- This is one half of closure: we get to reference variables from earlier scopes. -->
+
+**1st fundamental principle of closure**: If you don't declare a variable `x` inside of your current scope, you get to use `x` from the outer scope.
+
+
+
+--
+
+<!-- The other half is best represented with this program: -->
+
+**Exercise 12**: Consider the following JavaScript code.
+
+```ts
+function f() {
+  let y = 100;
+  return () => {
+    return y
+  }
+}
+
+let g = f()
+g() // => ?
+```
+
+What will the last line evaluate to?
+
+<!-- 
+
+[One hundred?]
+
+Yes! Let's take a closer look at the scopes to get an understanding of what's going on here.
+
+-->
+
+--
+
+```ts
+// start scope 0
+
+function f() {
+  // start scope 1
+
+  let y = 100;
+  return () => {
+    // start scope 2
+
+    return y
+
+    // start scope 2
+  }
+  
+  // end scope 1
+}
+
+let g = f() // enter and exit scope 1
+g() // enter and exit scope 2 => 100
+
+// end scope 0
+```
+
+<!--
+
+We have three scopes this time.
+It looks like the function returned in `f` is not only inheriting scope 1, but then *carrying it around*, long after we've exited them.
+
+-->
+
+--
+
+<!-- This is the heart of the second half of closure: functions carry their scopes with them. -->
+
+**2nd fundamental principle of closure**: Functions carry their scopes with them, *even if their parent scopes have closed*. This is called a **context**.
+
+<!-- We already saw this in exercises 10 and 11, but it becomes most obvious when we start creating functions that return functions. -->
+
+--
+
+**1st fundamental principle of closure**: If you don't declare a variable `x` inside of your current scope, you get to use `x` from the outer scope.
+
+**2nd fundamental principle of closure**: Functions carry their scopes with them, *even if their parent scopes have closed*. This is called a **context**.
+
+<!--
+
+Closure is what enables us to treat function evaluation like simplification while still getting all the nice benefits of abstract syntax.
+It's a very powerful concept.
+
+-->
+
+--
+
+Time to code again!
+
+<!-- With that, implementing functions should be an easy task. Let's switch back to Skylar to start coding. -->
 
 --
 
