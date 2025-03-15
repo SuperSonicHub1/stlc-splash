@@ -1,5 +1,5 @@
 ---
-title: Reveal-MD
+title: Lambda Calculus from Scratch
 theme: serif  # try solarized, serif or white
 ---
 
@@ -32,7 +32,7 @@ Along the way, we will implement good software development practices and _y'all_
       <th scope="col">Person</th>
       <th scope="col">Pronouns</th>
       <th scope="col">Headshot</th>
-      <th scope="col">Interests</th>
+      <!-- <th scope="col">Interests</th> -->
       <th scope="col">Class year</th>
     </tr>
   </thead>
@@ -43,7 +43,7 @@ Along the way, we will implement good software development practices and _y'all_
         <td>
             <img height="40%" width="40%" src="https://avatars.githubusercontent.com/u/67175934?v=4" />
         </td>
-        <td>Theoretical physics, software engineering</td>
+        <!-- <td>Theoretical physics, software engineering</td> -->
         <td>2028</td>
     </tr>
     <tr>
@@ -52,7 +52,7 @@ Along the way, we will implement good software development practices and _y'all_
       <td>
         <img height="40%" width="40%" src="https://avatars.githubusercontent.com/u/25624882?v=4" />
       </td>
-      <td>Systems design, language</td>
+      <!-- <td>Systems design, language</td> -->
       <td>2027</td>
     </tr>
   </tbody>
