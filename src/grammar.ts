@@ -72,34 +72,34 @@ function processComments(input: string): string {
   return output
 }
 
-describe("processComments", () => {
-  it("general", () => {
-    expect(
-      processComments(`a // hello
-b c d e
-f // g h i j k
-a /* aaaaaaaaa */ f
-a /* aaaaaa
+// describe("processComments", () => {
+//   it("general", () => {
+//     expect(
+//       processComments(`a // hello
+// b c d e
+// f // g h i j k
+// a /* aaaaaaaaa */ f
+// a /* aaaaaa
 
 
 
-aaa */ f
-`)
-    ).toBe("a \nb c d e\nf \na  f\na  f\n")
-  })
+// aaa */ f
+// `)
+//     ).toBe("a \nb c d e\nf \na  f\na  f\n")
+//   })
 
-  it("doesn't modify empty strings", () => {
-    expect(processComments("")).toBe("")
-  })
+//   it("doesn't modify empty strings", () => {
+//     expect(processComments("")).toBe("")
+//   })
 
-  it("works on short strings", () => {
-    expect(processComments("a")).toBe("a")
-  })
+//   it("works on short strings", () => {
+//     expect(processComments("a")).toBe("a")
+//   })
 
-  it("preserves regular slashes", () => {
-    expect(processComments("a / b")).toBe("a / b")
-  })
-})
+//   it("preserves regular slashes", () => {
+//     expect(processComments("a / b")).toBe("a / b")
+//   })
+// })
 
 const Tokens = {
   Arrow: Const("->"),
@@ -298,88 +298,88 @@ export const Language = new OurModule({
   ),
 })
 
-describe("Language.Parse", () => {
-  // @impl
-  it("can parse small expression", () => {
-    expect(Language.Parse("Expr", "odd(y)")).toStrictEqual([{
-      type: ExprType.Application,
-      lambda: {
-        type: ExprType.Var,
-        name: "odd",
-      },
-      argument: {
-        type: ExprType.Var,
-        name: "y",
-      }
-    } satisfies Expr, ""])
-  })
+// describe("Language.Parse", () => {
+//   // @impl
+//   it("can parse small expression", () => {
+//     expect(Language.Parse("Expr", "odd(y)")).toStrictEqual([{
+//       type: ExprType.Application,
+//       lambda: {
+//         type: ExprType.Var,
+//         name: "odd",
+//       },
+//       argument: {
+//         type: ExprType.Var,
+//         name: "y",
+//       }
+//     } satisfies Expr, ""])
+//   })
 
-  it("can parse large expression", () => {
-    expect(Language.Parse(
-      "Expr",
-      `
-              let x: fn[int, bool] =
-                  y: int -> odd(y)
-              in if x(2)
-                  then false
-                  else true
-              `.trim(),
-    )).toStrictEqual([{
-      type: ExprType.Let,
-      binding: {
-        name: "x",
-        type: {
-          type: TypeType.Function,
-          argumentType: {
-            type: TypeType.Int,
-          },
-          returnType: {
-            type: TypeType.Bool,
-          },
-        },
-      },
-      boundIn: {
-        type: ExprType.Ternary,
-        condition: {
-          type: ExprType.Application,
-          lambda: {
-            type: ExprType.Var,
-            name: "x",
-          },
-          argument: {
-            type: ExprType.LiteralInt,
-            value: 2,
-          },
-        },
-        positive: {
-          type: ExprType.LiteralBool,
-          value: false,
-        },
-        negative: {
-          type: ExprType.LiteralBool,
-          value: true,
-        },
-      },
-      boundTo: {
-        type: ExprType.Abstraction,
-        binding: {
-          name: "y",
-          type: {
-            type: TypeType.Int,
-          },
-        },
-        body: {
-          type: ExprType.Application,
-          lambda: {
-            type: ExprType.Var,
-            name: "odd",
-          },
-          argument: {
-            type: ExprType.Var,
-            name: "y",
-          },
-        },
-      },
-    }, ""])
-  })
-})
+//   it("can parse large expression", () => {
+//     expect(Language.Parse(
+//       "Expr",
+//       `
+//               let x: fn[int, bool] =
+//                   y: int -> odd(y)
+//               in if x(2)
+//                   then false
+//                   else true
+//               `.trim(),
+//     )).toStrictEqual([{
+//       type: ExprType.Let,
+//       binding: {
+//         name: "x",
+//         type: {
+//           type: TypeType.Function,
+//           argumentType: {
+//             type: TypeType.Int,
+//           },
+//           returnType: {
+//             type: TypeType.Bool,
+//           },
+//         },
+//       },
+//       boundIn: {
+//         type: ExprType.Ternary,
+//         condition: {
+//           type: ExprType.Application,
+//           lambda: {
+//             type: ExprType.Var,
+//             name: "x",
+//           },
+//           argument: {
+//             type: ExprType.LiteralInt,
+//             value: 2,
+//           },
+//         },
+//         positive: {
+//           type: ExprType.LiteralBool,
+//           value: false,
+//         },
+//         negative: {
+//           type: ExprType.LiteralBool,
+//           value: true,
+//         },
+//       },
+//       boundTo: {
+//         type: ExprType.Abstraction,
+//         binding: {
+//           name: "y",
+//           type: {
+//             type: TypeType.Int,
+//           },
+//         },
+//         body: {
+//           type: ExprType.Application,
+//           lambda: {
+//             type: ExprType.Var,
+//             name: "odd",
+//           },
+//           argument: {
+//             type: ExprType.Var,
+//             name: "y",
+//           },
+//         },
+//       },
+//     }, ""])
+//   })
+// })

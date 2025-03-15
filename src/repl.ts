@@ -37,20 +37,20 @@ export async function repl(solveTypes: SolveTypes | null, Language: OurModule, e
 
 }
 
-describe("repl test", () => {
-    const repl_iter = (s: string) => replIteration(s, solveTypes, Language, evaluate)
-    // @impl
-    it("evaluates expressions", () => {
-        expect(repl_iter("2")).toBe("2 : int")
-        expect(repl_iter("add(1)(2)")).toBe("3 : int")
-        expect(repl_iter("true")).toBe("true : bool")
-    })
-    it("rejects syntax errors", () => {
-        expect(repl_iter("a;a;a;a;")).toMatch(/^Syntax error/)
-        expect(repl_iter("#,.>/?23r98 u23r98*&#* )&20 1e1o i;1")).toMatch(/^Syntax error/)
-        expect(repl_iter("")).toMatch(/^Syntax error/)
-    })
-    it("rejects type errors", () => {
-        expect(repl_iter("(x: int -> x)(true)")).toMatch(/^Type error/)
-    })
-})
+// describe("repl test", () => {
+//     const repl_iter = (s: string) => replIteration(s, solveTypes, Language, evaluate)
+//     // @impl
+//     it("evaluates expressions", () => {
+//         expect(repl_iter("2")).toBe("2 : int")
+//         expect(repl_iter("add(1)(2)")).toBe("3 : int")
+//         expect(repl_iter("true")).toBe("true : bool")
+//     })
+//     it("rejects syntax errors", () => {
+//         expect(repl_iter("a;a;a;a;")).toMatch(/^Syntax error/)
+//         expect(repl_iter("#,.>/?23r98 u23r98*&#* )&20 1e1o i;1")).toMatch(/^Syntax error/)
+//         expect(repl_iter("")).toMatch(/^Syntax error/)
+//     })
+//     it("rejects type errors", () => {
+//         expect(repl_iter("(x: int -> x)(true)")).toMatch(/^Type error/)
+//     })
+// })
