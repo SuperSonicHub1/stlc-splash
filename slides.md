@@ -202,7 +202,9 @@ An application is an expression next to another encased in parentheses. <!-- .el
 
 We can use parentheses to control order of operations. <!-- .element: class="fragment" -->
 
-To think about: How can we more precisely state what is a syntactically valid string? <!-- .element: class="fragment" -->
+--
+
+To think about: How can we more precisely state what is a syntactically valid string?
 
 <!-- Pause for questions (15 seconds!). -->
 
@@ -244,7 +246,9 @@ Application consists of taking your input expression, and putting it everywhere 
 
 We need to be careful about re-using variable names in an expression; the rules that govern simplification in this regard are called **closure**. <!-- .element: class="fragment" -->
 
-To think about: How would we implement simplification as a algorithm on a computer? <!-- .element: class="fragment" -->
+--
+
+To think about: How would we implement simplification as a algorithm on a computer?
 
 <!-- Pause for questions (15 seconds!). -->
 
