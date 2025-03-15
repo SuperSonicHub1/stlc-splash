@@ -3,9 +3,12 @@ title: Lambda Calculus from Scratch
 theme: serif  # try solarized, serif or white
 ---
 
+
 # Lambda Calculus from Scratch
 
 MIT ESP Splash 2025 • M03 16 2025 Skylar N. Huber, Kyle A. Williams
+
+<!-- TODO(supersonichub1): Add pauses for questions -->
 
 --
 
@@ -770,6 +773,173 @@ Time to code again!
 --
 
 ## Chunk 3: Types
+
+<!-- 
+
+Integers, booleans, and functions now live alongside each other.
+However, there is something sick regarding Pai.
+We can write nonsensical programs like this one:
+
+-->
+
+A syntactically valid yet nonsensical program: 
+
+```ts
+5(3)
+```
+
+
+<!-- 
+
+This is a syntactically valid program, but semantically nonsensical: you can't apply an integer to an integer, as the latter isn't a function.
+As we saw in our last coding segment, our current defense against this is to throw an exception at runtime.
+
+-->
+
+We can (and should!) prevent our users from running programs like this! <!-- .element: class="fragment" -->
+
+<!--
+
+Wouldn't it be nice if we could tell the user that their program is ill-formed before they run it?
+The solution is returning to an idea we discussed at the beginning of this talk: the simply typed lambda calculus.
+
+-->
+
+--
+
+### How do types work?
+
+<!--
+
+Instead of jumping into syntax, I first want to establish how types work.
+
+-->
+
+A **type** is a collection of objects which have some common properties and relationships. <!-- .element: class="fragment" -->
+
+Pai has three collections: <!-- .element: class="fragment" -->
+
+The integers: `…, -3, -2, -1, 0, 1, 2, 3, … : int` <!-- .element: class="fragment" -->
+
+The booleans: `true, false : bool` <!-- .element: class="fragment" -->
+
+Functions: `add(x)(y) : fn[int, fn[int, int]]` <!-- .element: class="fragment" -->
+
+--
+
+`:` translates to "has the type." For example, `0 : int` reads as "zero has the type `int`."
+
+In Pai, all expressions must belong to a type.
+If one doesn't, it is *illegal* and should not be run. <!-- .element: class="fragment" -->
+
+We can describe what expressions get types using **judgments**: very fancy if-then rules. <!-- .element: class="fragment" -->
+
+--
+
+Consider the following judgement:
+
+$$ \frac{}{ \texttt{true} : \textsf{bool} } $$
+$$ \frac{}{ \texttt{false} : \textsf{bool} } $$
+
+<!--
+
+These judgement together tell us that `true` and `false` are of type `bool`.
+Judgement are read from top to bottom: if everything above the line, the *antecedent* is true, then everything below, the consequent, is true as well. [write on board]
+If nothing is above the line, then the consequent is automatically true.
+One might call judgement like these *axioms*.
+
+-->
+
+--
+
+A similar judgement for the literal integers:
+
+$$ \frac{}{ \texttt{0} : \textsf{int} } $$
+
+<!-- Y'all can extrapolate this rule to the other integers. -->
+
+--
+
+<!--
+
+The judgement for abstraction and application are a bit more intense.
+To support it, we'll take our concepts of scope and context from evaluation and bring them to types.
+
+-->
+
+$$ \Gamma = \set{ \texttt{x} : \mathsf{bool}, \texttt{y} : \mathsf{bool} } $$
+
+A **type context** is a set of facts regarding variable names and their types types.
+Traditionally represented using the Greek letter "gamma," $\Gamma$.
+
+--
+
+New facts can be added using the union ($\cup$) operator:
+
+$$ \set{ \texttt{x} : \mathsf{bool}, \texttt{y} : \mathsf{bool} } \\, \cup \\, (\texttt{z} : \textsf{fn[int, int]})$$
+$$  = \set{ \texttt{x} : \mathsf{bool}, \texttt{y} : \mathsf{bool}, \texttt{z} : \textsf{fn[int, int]} } $$
+
+$$ \set{ \texttt{x} : \mathsf{bool} } \\, \cup \\, (\texttt{x} : \textsf{int}) = \set{\texttt{x} : \textsf{int}}  $$
+<!-- Follows the 1st fundamental rule of closure. -->
+
+--
+
+We can then use them like this:
+
+$$ \frac{ \texttt{x} : \alpha \in \Gamma }{ \Gamma \vdash \texttt{x} : \alpha } $$
+
+<!--
+
+Here, `x` is a stand-in for any variable, and the Greek letter "alpha" is a stand-in for any type.
+We introduce a new kind of fact in the consequent: that little "vertical dash" reads as "in the context of".
+
+So, reading it from top to bottom:
+if some context gamma contains the fact "x is of type alpha",
+then, in the context of type gamma, "x is of type alpha".
+
+-->
+
+With the introduction of the type context and our judgment for variables, we are now ready introduce our judgments and new syntax for abstraction and application.
+
+--
+
+To support types, we need to make only a few amendments to the grammar:
+
+```
+<binding> ::= <identifier> ":" <type>
+<type> ::= "int" | "bool" | ("fn" "[" <type> "," <type> "]")
+
+# recall <abstraction> ::= <binding> "->" <expr>
+```
+
+Now we write abstractions like this: `x : int -> x`
+
+<!-- Good thing we made that useful abstraction in our grammar earlier. -->
+
+--
+
+Rules for abstraction and application:
+
+$$ \frac{ (\Gamma \cup (\texttt{x} : \alpha)) \vdash \texttt{\<expr\>} : \beta }{ \Gamma \vdash \texttt{x : α -> \<expr\>} : \mathsf{fn[\alpha, \beta]} } $$
+
+$$ \frac{ \Gamma \vdash \texttt{\<expr\>_1} : \mathsf{fn[\alpha, \beta]}, \texttt{\<expr\>_2} : \alpha }{ \Gamma \vdash \texttt{\<expr\>_1(\<expr\>_2)} : \beta } $$
+
+<!--
+
+<expr> is just a placeholder expression. Again, `x` is a placeholder variable, and Greek letters alpha and beta are placeholder types.
+Abstraction: If, in the context of Gamma plus the fact "x is of type alpha", an expression is of type beta, then, in that same context, a function of x with body <expr> is has the type "function of alpha to beta."
+This implements the second fundamental principle of closure, abstractions walk around with an extension of the context they're created in.
+
+Abstraction: If, in the context of Gamma plus the fact "x is of type alpha", an expression is of type beta, then, in that same context, a function of x with body <expr> is has the type "function of alpha to beta."
+Application: If, in the context of Gamma, an expression expr_1 has the type "function of alpha to beta", and an expression expr_2 has the type "alpha", then, in the context of Gamma, expr_2 applied to expr_1 has the type "beta."
+
+-->
+
+--
+
+<!-- With that, y'all are now experts at types! Let's switch back to Skylar to see how to implement this. -->
+
+Back to programming!
 
 --
 
