@@ -1,6 +1,6 @@
 ---
 title: Lambda Calculus from Scratch
-theme: serif  # try solarized, serif or white
+theme: serif 
 ---
 
 
@@ -213,7 +213,7 @@ To think about: How can we more precisely state what is a syntactically valid st
 
 --
 
-#### Execution Semantics
+#### Evaluation Semantics
 
 Now that we know what programs we can write, let's begin to understand what they can do.
 
@@ -237,7 +237,7 @@ Closure 2: (x -> (z -> x))(z) => y -> y(z)
 
 --
 
-Execution in the lambda calculus is just *simplification*!
+Evaluation in the lambda calculus is just *simplification*!
 
 <!-- Pause for questions. (15 seconds!) -->
 
@@ -945,11 +945,225 @@ Back to programming!
 
 ## Chunk 4: Builtins and FFI
 
+Y'all have likely noticed that we can't do much with Pai as of now.
+
+<!-- For example, we have no way to add and subtract integers.  -->
+
+We're going to fix that by introducing **builtins**!
+
+--
+
+The plan is simple: we will make the top level scope of a Pai program contain a collection of useful functions for working with data.
+
+For example:
+
+```ts
+add(1)(2) // => 3
+```
+
+--
+
+Typing judgments for builtins are quite similar to those for our value literals:
+
+$$ \frac{}{ \texttt{add} : \mathsf{fn[int, fn[int]]} } $$
+
+<!--
+
+Technical note:
+`add`, unlike `1`, is just a variable, so it can be "overwritten" using closure.
+Think of this rule as stating the type of add in a "default" context.
+
+-->
+
+--
+
+Describing evaluation is a bit more complicated, as we'll be delegating entirely to JavaScript.
+
+For example, this is the implementation of `add`:
+
+```ts
+(a, b) => a + b
+```
+
+<!-- Skylar will make this much more clear when we switch over to her. -->
+
+--
+
+Time to code!
+
 --
 
 ## Chunk 5: A Real Programming Language
 
+At this point, we now have a sensible implementation of the simply typed lambda calculus.
+
+Let's end today's lecture by extending the calculus with two new language features: the **ternary conditional** and **`let` expression**.
+
+--
+
+### Ternary Conditional
+
+The ternary conditional is the `if` statement for expressions: it returns one of two expressions based on a boolean condition.
+
+An implementation of the $\operatorname{sign}$ function:
+```ts
+x: int -> if greater(x)(0) then 1
+  else if eq(x)(0) then 0
+  else -1
+```
+
+Compare to JavaScript:
+```ts
+(x) => x > 0 ? 1
+  : x == 0 ? 0
+  : -1
+```
+
+--
+
+With all the new skills we've picked up today, making this addition is now easy!
+
+--
+
+First, the grammar:
+
+```
+<ternary> ::= "if" <expr> "then" <expr> "else" <expr>
+<expr> ::= … | <ternary>
+```
+
+<!-- Put on board! -->
+
+--
+
+Then, the execution semantics:
+
+```ts
+if true then <expr>_1 else <expr>_2 => <expr>_1
+if false then <expr>_1 else <expr>_2 => <expr>_2
+```
+
+<!-- We actually can return to our simplification idiom for this one.  -->
+
+--
+
+And lastly, our typing judgement:
+
+$$ \small \frac{ \Gamma \vdash \texttt{\<expr\>_c} : \mathsf{bool}, \texttt{\<expr\>_1} : \alpha, \texttt{\<expr\>_2} : \alpha }{ \Gamma \vdash \texttt{if \<expr\>_c then \<expr\>_1 else \<expr\>_2 } : \alpha } $$
+
+
+--
+
+There we go, new feature!
+
+```
+<ternary> ::= "if" <expr> "then" <expr> "else" <expr>
+<expr> ::= … | <ternary>
+```
+
+```ts
+if true then <expr>_1 else <expr>_2 => <expr>_1
+if false then <expr>_1 else <expr>_2 => <expr>_2
+```
+
+$$ \small \frac{ \Gamma \vdash \texttt{\<expr\>_c} : \mathsf{bool}, \texttt{\<expr\>_1} : \alpha, \texttt{\<expr\>_2} : \alpha }{ \Gamma \vdash \texttt{if \<expr\>_c then \<expr\>_1 else \<expr\>_2 } : \alpha } $$
+
+<!--
+
+Put on board.
+
+I think this is demonstrative of why having formal tools like grammars, simplification, and judgments is so important.
+Once you use them long enough, you start *thinking* in them, and then everything else flows from there.
+
+-->
+
+### `let` Statements
+
+<!-- Alright, now for `let` statements. -->
+
+The `let` expression is the `let` statement for expressions: it allows you to create a binding and use it inside of a child expression.
+
+
+Uisng `let` to create helper functions:
+```ts
+let add_one: fn[int, int] = add(1) in add_one(add_one(0))
+```
+
+Compare to Jav
+```ts
+let add_one = (x) => x + 1
+add_one(add_one(0))
+```
+
+--
+
+Some of you may have had a hunch that `let` expressions are functions in trenchcoats. You're right:
+
+```ts
+let <binding> = <expr>_1 in <expr>_2
+=> (<binding> -> <expr>_2)(<expr>_1)
+```
+
+<!--
+
+And just like that, we've already discussed simplification.
+Let expressions aren't really adding new functionality to Pai, they just make expressing a very common idea much easier.
+
+-->
+
+--
+
+As you could likely tell from the last slide, the grammar is quite simple:
+
+```
+<let> ::= "let" <binding> "=" <expr> "in" <expr>
+<expr> ::= … | <ternary> | <let>
+```
+
+<!-- Put on board. -->
+
+--
+
+And finally, the judgment:
+
+$$\frac{\Gamma \vdash \texttt{\<expr\>_1} : \alpha; (\Gamma \cup (\texttt{x}:\alpha))\vdash \texttt{\<expr\>_2}:\beta} {\Gamma \vdash \texttt{let x = \<expr\>_1 in \<expr\>_2} : \beta}$$
+
+<!-- Put on board. -->
+
+--
+
+There we go!
+
+```
+<let> ::= "let" <binding> "=" <expr> "in" <expr>
+<expr> ::= … | <ternary> | <let>
+```
+
+```ts
+let <binding> = <expr>_1 in <expr>_2
+=> (<binding> -> <expr>_2)(<expr>_1)
+```
+
+$$\frac{\Gamma \vdash \texttt{\<expr\>_1} : \alpha; (\Gamma \cup (\texttt{x}:\alpha))\vdash \texttt{\<expr\>_2}:\beta} {\Gamma \vdash \texttt{let x = \<expr\>_1 in \<expr\>_2} : \beta}$$
+
+
+--
+
+<!-- Alright, let's head back to Skylar to wrap up today's class -->
+
+Last coding sesh!
+
 --
 
 ## What next?
+
+We'll be sending y'all an email containing a copy of our codebase. Please feel free to extend it!
+
+If you want a great book to read to better understand the theory of programming languages, check out Felleisen *et al.*'s *Semantics Engineering with PLT Redex*.
+
+If you want a great book to read to better understand the practice of programming languages, check out Nystrom's *Crafting Interpreters*, which is fre to read online!
+
+--
+
+# Thank you for coming!
 
