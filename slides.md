@@ -20,8 +20,6 @@ We will use the canonical model for PLs, the _lambda calculus_ (LC), as a guide.
 
 We will extend the LC to support "modern" programming features like `let` and `if`. <!-- .element: class="fragment" -->
 
-Along the way, we will implement good software development practices and _y'all_ will write some code! <!-- .element: class="fragment" -->
-
 --
 
 ### Who are we?
@@ -308,7 +306,7 @@ in polynomial(1)(2)(3)(4)
 
 ## Break 1
 
-**Exercise 6**: Look at some cats to wash down all the math you just ate (three (3) minute break).
+**Exercise 6**: Take a five (5) minute break.
 
 --
 
@@ -368,9 +366,7 @@ We'll keep this on the board for your reference.
 
 --
 
-With that out of the way, y'all now have everything you need to start writing some code.
-
-Talk is cheap; **time for programming!**
+With that out of the way, y'all now have everything you need to start grappling with creating a programming language.
 
 --
 
@@ -772,6 +768,10 @@ Time to code again!
 
 --
 
+**Exercise 13**: Take another five (5) minute break.
+
+--
+
 ## Chunk 3: Types
 
 <!-- 
@@ -899,7 +899,7 @@ then, in the context of type gamma, "x is of type alpha".
 
 -->
 
-With the introduction of the type context and our judgment for variables, we are now ready introduce our judgments and new syntax for abstraction and application.
+<!-- With the introduction of the type context and our judgment for variables, we are now ready introduce our judgments and new syntax for abstraction and application. -->
 
 --
 
@@ -922,7 +922,7 @@ Rules for abstraction and application:
 
 $$ \frac{ (\Gamma \cup (\texttt{x} : \alpha)) \vdash \texttt{\<expr\>} : \beta }{ \Gamma \vdash \texttt{x : α -> \<expr\>} : \mathsf{fn[\alpha, \beta]} } $$
 
-$$ \frac{ \Gamma \vdash \texttt{\<expr\>_1} : \mathsf{fn[\alpha, \beta]}, \texttt{\<expr\>_2} : \alpha }{ \Gamma \vdash \texttt{\<expr\>_1(\<expr\>_2)} : \beta } $$
+$$ \frac{ \Gamma \vdash \texttt{\<expr\>_1} : \mathsf{fn[\alpha, \beta]}, \texttt{\<expr\>_2} : \alpha }{ \Gamma \vdash \texttt{\<expr\>_1(\<expr\>_2)} : \beta } $$ <!-- .element: class="fragment" -->
 
 <!--
 
@@ -1077,9 +1077,11 @@ Once you use them long enough, you start *thinking* in them, and then everything
 
 -->
 
-### `let` Statements
+--
 
-<!-- Alright, now for `let` statements. -->
+### `let` Expressions
+
+<!-- Alright, now for `let` expressions. -->
 
 The `let` expression is the `let` statement for expressions: it allows you to create a binding and use it inside of a child expression.
 
@@ -1089,7 +1091,7 @@ Uisng `let` to create helper functions:
 let add_one: fn[int, int] = add(1) in add_one(add_one(0))
 ```
 
-Compare to Jav
+Compare to JavaScript:
 ```ts
 let add_one = (x) => x + 1
 add_one(add_one(0))
@@ -1161,7 +1163,7 @@ We'll be sending y'all an email containing a copy of our codebase. Please feel f
 
 If you want a great book to read to better understand the theory of programming languages, check out Felleisen *et al.*'s *Semantics Engineering with PLT Redex*.
 
-If you want a great book to read to better understand the practice of programming languages, check out Nystrom's *Crafting Interpreters*, which is fre to read online!
+If you want a great book to read to better understand the practice of programming languages, check out Nystrom's *Crafting Interpreters*, which is free to read online!
 
 --
 
