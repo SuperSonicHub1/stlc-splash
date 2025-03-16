@@ -138,12 +138,16 @@ export const Language = new OurModule({
       Array(Tuple([
         Tokens.LParen,
         Ref<Expr>("Expr"),
+        Array(Tuple([
+          Tokens.Comma,
+          Ref<Expr>("Expr"),
+        ])),
         Tokens.RParen,
-      ], ([, expr]) => expr)),
+      ], ([, expr, arglist]) => [expr, ...arglist.map(([, expr]) => expr)])),
     ],
     ([base, applicationArgs]) => {
       let expr = base
-      for (const argument of applicationArgs) {
+      for (const argument of applicationArgs.flat()) {
         expr = { type: ExprType.Application, lambda: expr, argument }
       }
       return expr
