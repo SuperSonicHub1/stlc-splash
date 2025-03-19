@@ -1,7 +1,11 @@
 # stlc-splash
 Tutorial on the simply typed lambda calculus for [Splash](https://esp.mit.edu/learn/Splash/index.html) 2025.
 
-**NOTE**: Skylar and Kyle, do not push changes directly to the `master` branch, but instead to `develop`.
+Slides in `slides.md`; code in `src`.
+Code written in TypeScript using the [Deno](https://deno.com/) runtime.
+
+After installing Deno, run `deno install` to fetch all dependencies.
+See `src/test.ts` for example usage.
 
 ## License
 
